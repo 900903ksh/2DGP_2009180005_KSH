@@ -1,0 +1,56 @@
+{
+	"Bulldog" : {
+		"image": "resource/enemy/Emy1_Bulldog.png",
+		"MOVE"   : { "frame":8,  "left":121, "bottom":468, "width":121, "height":100, "plusX":0,  "plusY":0  },
+		"ATTACK" : { "frame":11, "left":142, "bottom":333, "width":142, "height":135, "plusX":-5, "plusY":16 },
+		"DIE"    : { "frame":5,  "left":140, "bottom":228, "width":140, "height":100, "plusX":5,  "plusY":-6 },
+		"HIT"    : { "frame":1,  "left":130, "bottom":128, "width":130, "height":100, "plusX":0,  "plusY":-4 } },
+
+	"Lycanthrope" : {
+		"image": "resource/enemy/Emy2_Lycanthrope.png",
+		"MOVE"   : { "frame":4,  "left":182, "bottom":725, "width":182, "height":190, "plusX":0,   "plusY":0   },
+		"ATTACK" : { "frame":12, "left":401, "bottom":485, "width":401, "height":240, "plusX":-80, "plusY":28  },
+		"DIE"    : { "frame":8,  "left":264, "bottom":305, "width":264, "height":170, "plusX":-63, "plusY":-10 },
+		"HIT"    : { "frame":1,  "left":190, "bottom":115, "width":190, "height":190, "plusX":-6,  "plusY":-1  } },
+
+	"CorruptedWyvern" : {
+		"image": "resource/enemy/Emy3_CorruptedWyvern.png",
+		"MOVE"   : { "frame":6,  "left":198, "bottom":743, "width":198, "height":190, "plusX":0,   "plusY":0  },
+		"ATTACK" : { "frame":18, "left":280, "bottom":543, "width":280, "height":190, "plusX":-33, "plusY":-2 },
+		"DIE"    : { "frame":5,  "left":194, "bottom":323, "width":194, "height":210, "plusX":-2,  "plusY":-9 },
+		"HIT"    : { "frame":1,  "left":190, "bottom":133, "width":190, "height":190, "plusX":12,  "plusY":0  } },
+
+	"CorruptedCornian" : {
+		"image": "resource/enemy/Emy4_CorruptedCornian.png",
+		"MOVE"   : { "frame":4,  "left":191, "bottom":732, "width":191, "height":190, "plusX":0,  "plusY":0  },
+		"ATTACK" : { "frame":12, "left":301, "bottom":532, "width":301, "height":200, "plusX":12, "plusY":-9 },
+		"DIE"    : { "frame":6,  "left":220, "bottom":322, "width":220, "height":200, "plusX":14, "plusY":6  },
+		"HIT"    : { "frame":1,  "left":210, "bottom":122, "width":210, "height":200, "plusX":18, "plusY":2  } },
+
+	"DemonGargoyle" : {
+		"image": "resource/enemy/Emy5_DemonGargoyle.png",
+		"MOVE"   : { "frame":7,  "left":133, "bottom":697, "width":133, "height":140, "plusX":0,   "plusY":0  },
+		"ATTACK" : { "frame":18, "left":307, "bottom":497, "width":307, "height":200, "plusX":-10, "plusY":15 },
+		"DIE"    : { "frame":13, "left":175, "bottom":347, "width":175, "height":140, "plusX":21,  "plusY":-3 },
+		"HIT"    : { "frame":1,  "left":160, "bottom":197, "width":160, "height":140, "plusX":22,  "plusY":3  } },
+
+	"JuniorBalrog" : {
+		"image": "resource/enemy/Emy6_JuniorBalrog.png",
+		"MOVE"   : { "frame":5,  "left":195, "bottom":835, "width":195, "height":180, "plusX":0,  "plusY":0  },
+		"ATTACK" : { "frame":4,  "left":211, "bottom":645, "width":211, "height":190, "plusX":-5, "plusY":6  },
+		"DIE"    : { "frame":3,  "left":255, "bottom":465, "width":255, "height":180, "plusX":9,  "plusY":-1 },
+		"HIT"    : { "frame":1,  "left":190, "bottom":280, "width":190, "height":180, "plusX":14, "plusY":-2 } },
+
+	"CrimsonBalrog" : {
+		"image": "resource/enemy/Emy7_CrimsonBalrog.png",
+		"MOVE"   : { "frame":4,  "left":322, "bottom":1382, "width":322, "height":330, "plusX":0,  "plusY":0  },
+		"ATTACK" : { "frame":8,  "left":322, "bottom":1052, "width":322, "height":330, "plusX":-2, "plusY":1  },
+		"DIE"    : { "frame":10, "left":170, "bottom":652,  "width":170, "height":395, "plusX":7,  "plusY":-9 },
+		"HIT"    : { "frame":1,  "left":180, "bottom":327,  "width":180, "height":320, "plusX":16, "plusY":-5 } },
+
+	"BabyBalrog" : {
+		"image": "resource/enemy/EmyBonus_BabyBalrog",
+		"MOVE"   : { "frame":8,  "left":102, "bottom":230, "width":102, "height":100, "plusX":0,  "plusY":0   },
+		"DIE"    : { "frame":14, "left":145, "bottom":100, "width":145, "height":120, "plusX":11, "plusY":-11 },
+		"HIT"    : { "frame":1,  "left":110, "bottom":0,   "width":110, "height":100, "plusX":1,  "plusY":-1  } }
+}
