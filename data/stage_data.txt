@@ -1,0 +1,5 @@
+{
+	"stage1" : { "bottom":100, "end":2400 },
+	"stage2" : { "bottom":65,  "end":2400 },
+	"stage3" : { "bottom":40,  "end":1200 }
+}
