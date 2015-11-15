@@ -1,215 +1,184 @@
 from pico2d import *
+import random
 
-running = None
+friend_data_file = open('data/friend_data.txt', 'r')
+friend_data = json.load(friend_data_file)
+friend_data_file.close()
 
-class Friend_1:
+stage_data_file = open('data/stage_data.txt', 'r')
+stage_data = json.load(stage_data_file)
+stage_data_file.close()
+
+
+class Friend:
     image = None
-    MOVE,ATTACK,DIE,HIT = 0, 1, 2, 3
 
-    def __init__(self):
-        if Friend_1.image == None:
-            Friend_1.image = load_image('resource/friend/friend1.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
-            self.state = self.MOVE
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 5
 
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 4
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 8
-        elif self.state == self.DIE:
-            self.state_frame = 6
-        elif self.state == self.HIT:
-            self.state_frame = 1
+    STAND, MOVE, ATTACK, DIE, HIT = 'STAND', 'MOVE', 'ATTACK', 'DIE', 'HIT'
 
-        self.frame = (self.frame + 1) % self.state_frame
+    def __init__(self, name):
+        self.name = name
+        self.state = self.MOVE
+        self.current_state = None
+        self.past_state = None
+        self.image = load_image(friend_data[name]['image'])
+        self.x, self.y = 200, stage_data['stage2']['bottom'] + friend_data[name]['pivotY']
+        self.hp = friend_data[name]['hp']
+        self.damage = friend_data[name]['damage']
+        self.frame = 0
+        self.total_frame = 0
+        self.state_frame = friend_data[name][self.state]['frame']
+        self.check = False
+        self.die_check = False
+
+    def update(self, frame_time, targetList):
+        if self.state != self.past_state:
+            self.change_state()
+        self.total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % self.state_frame
+
+        self.handle_state[self.state](self, frame_time, targetList)
+
+
 
     def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 95, 470, 95, 110, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 109, 350, 109, 120, 300 + self.x+8, 205+6)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 95, 240, 95, 110, 300 + self.x, 205-3)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 110, 120, 110, 120, 300 + self.x+6, 205+8)
+        self.image.clip_draw(self.frame * friend_data[self.name][self.state]['left'], friend_data[self.name][self.state]['bottom'],\
+                             friend_data[self.name][self.state]['width'], friend_data[self.name][self.state]['height'],\
+                             self.x + friend_data[self.name][self.state]['plusX'], self.y + friend_data[self.name][self.state]['plusY'])
+        self.draw_bb()
 
+    def handle_stand(self, frame_time, targetList):
+        for target in targetList:
+            if target.state == target.ATTACK:
+                if self.collide(self.get_hit_bb(), target.get_attack_bb()) == True:
+                    if target.frame == 4:
+                        self.state = self.HIT
+            elif target.state != target.DIE:
+                if self.collide(self.get_hit_bb(), target.get_hit_bb()) == True:
+                    self.state = self.ATTACK
 
-class Friend_2:
-    image = None
-    MOVE,ATTACK,DIE,HIT = 0, 1, 2, 3
-
-    def __init__(self):
-        if Friend_2.image == None:
-            Friend_2.image = load_image('resource/friend/friend2.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
+        if self.total_frame > self.state_frame * 2:
             self.state = self.MOVE
 
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 4
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 8
-        elif self.state == self.DIE:
-            self.state_frame = 6
-        elif self.state == self.HIT:
-            self.state_frame = 1
+    def handle_move(self, frame_time, targetList):
+        for target in targetList:
+            if self.collide(self.get_hit_bb(), target.get_hit_bb()) == True:
+                self.state = self.ATTACK
+            elif target.state == target.ATTACK:
+                if self.collide(self.get_hit_bb(), target.get_attack_bb()) == True:
+                    if target.frame == 4:
+                        self.state = self.HIT
 
-        self.frame = (self.frame + 1) % self.state_frame
+        self.x += self.speed() * frame_time
 
-    def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 95, 490, 95, 115, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 109, 370, 109, 120, 300 + self.x+8, 205+3)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 100, 250, 100, 120, 300 + self.x+2, 205-4)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 110, 120, 110, 120, 300 + self.x+6, 205)
+    def handle_attack(self, frame_time, targetList):
+        if self.total_frame > self.state_frame:
+            self.state = self.STAND
+        for target in targetList:
+            if target.state == target.ATTACK:
+                if self.collide(self.get_hit_bb(), target.get_attack_bb()) == True:
+                    if target.frame == 4:
+                        self.is_damaged(target)
 
+    def handle_die(self, frame_time, targetList):
+        if self.total_frame > self.state_frame:
+            self.die_check = True
 
-class Friend_3:
-    image = None
-    MOVE,ATTACK,DIE,HIT = 0, 1, 2, 3
+    def handle_hit(self, frame_time, targetList):
+        for target in targetList:
+            self.is_damaged(target)
+        if self.total_frame > 3:
+            self.state = self.STAND
+        # if self.hp < 0:
+        #     self.state = self.DIE
+        # for target in targetList:
+        #     self.is_damaged(target)
 
-    def __init__(self):
-        if Friend_3.image == None:
-            Friend_3.image = load_image('resource/friend/friend3.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
-            self.state = self.MOVE
+    handle_state = {
+        STAND : handle_stand,
+        MOVE: handle_move,
+        ATTACK: handle_attack,
+        DIE: handle_die,
+        HIT: handle_hit
+    }
 
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 4
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 12
-        elif self.state == self.DIE:
-            self.state_frame = 11
-        elif self.state == self.HIT:
-            self.state_frame = 1
+    def is_damaged(self, target):
+        if self.check == False and target.frame == 4:
+            self.check = True
+            self.hp -= target.damage
+            print("%f"%self.hp)
+        elif self.check == True and target.frame > 5:
+            self.check = False
+        if self.hp <= 0:
+            self.state = self.DIE
 
-        self.frame = (self.frame + 1) % self.state_frame
+    def change_state(self):
+        self.state_frame = friend_data[self.name][self.state]['frame']
+        self.total_frame = 0.0
+        self.past_state = self.state
+        pass
 
-    def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 140, 600, 140, 155, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 160, 445, 160, 155, 300 + self.x+20, 205)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 157, 280, 157, 165, 300 + self.x-24, 205+1)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 160, 125, 160, 165, 300 + self.x+1, 205+13)
+    def speed(self):
+        PIXEL_PER_METER = (10.0 / 1.1)                             # 10 pixel 110 cm
+        RUN_SPEED_KMPH = friend_data[self.name]['speed']
+        RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+        RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+        RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+        return RUN_SPEED_PPS
 
-class Friend_4:
-    image = None
-    MOVE,ATTACK,DIE,HIT = 0, 1, 2, 3
+    def get_bb(self):
+        return self.x - friend_data[self.name][self.state]['width']/2 + friend_data[self.name][self.state]['plusX'], \
+                self.y - friend_data[self.name][self.state]['height']/2 + friend_data[self.name][self.state]['plusY'],\
+                self.x + friend_data[self.name][self.state]['width']/2 + friend_data[self.name][self.state]['plusX'], \
+                self.y + friend_data[self.name][self.state]['height']/2 + friend_data[self.name][self.state]['plusY']
 
-    def __init__(self):
-        if Friend_4.image == None:
-            Friend_4.image = load_image('resource/friend/friend4.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
-            self.state = self.MOVE
+    def get_hit_bb(self):
+        return self.x - friend_data[self.name]['MOVE']['width']/2 + friend_data[self.name]['MOVE']['plusX'], \
+                self.y - friend_data[self.name]['MOVE']['height']/2 + friend_data[self.name]['MOVE']['plusY'],\
+                self.x + friend_data[self.name]['MOVE']['width']/2 + friend_data[self.name]['MOVE']['plusX'], \
+                self.y + friend_data[self.name]['MOVE']['height']/2 + friend_data[self.name]['MOVE']['plusY']
 
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 4
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 8
-        elif self.state == self.DIE:
-            self.state_frame = 10
-        elif self.state == self.HIT:
-            self.state_frame = 1
+    def get_attack_bb(self):
+        return self.x - friend_data[self.name]['ATTACK']['width']/2 + friend_data[self.name]['ATTACK']['plusX'], \
+                self.y - friend_data[self.name]['ATTACK']['height']/2 + friend_data[self.name]['ATTACK']['plusY'],\
+                self.x + friend_data[self.name]['ATTACK']['width']/2 + friend_data[self.name]['ATTACK']['plusX'], \
+                self.y + friend_data[self.name]['ATTACK']['height']/2 + friend_data[self.name]['ATTACK']['plusY']
 
-        self.frame = (self.frame + 1) % self.state_frame
+    def draw_bb(self):
+        draw_rectangle(*self.get_bb())
 
-    def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 155, 605, 155, 120, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 460, 475, 460, 120, 300 + self.x+81, 205-1)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 215, 260, 215, 155, 300 + self.x-32, 205+17)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 155, 120, 155, 120, 300 + self.x+1, 205-1)
+    def collide(self, a, b):
+        left_self, bottom_self, right_self, top_self = a
+        left_target, bottom_target, right_target, top_target = b
 
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
 
-class Friend_5:
-    image = None
-    MOVE,ATTACK,DIE,HIT,REGEN = 0, 1, 2, 3, 4
+        return True
 
-    def __init__(self):
-        if Friend_5.image == None:
-            Friend_5.image = load_image('resource/friend/friend5.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
-            self.state = self.MOVE
+    def hit_collide(self, target):
+        left_self, bottom_self, right_self, top_self = self.get_hit_bb()
+        left_target, bottom_target, right_target, top_target = target.get_hit_bb()
 
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 6
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 12
-        elif self.state == self.DIE:
-            self.state_frame = 7
-        elif self.state == self.HIT:
-            self.state_frame = 1
-        elif self.state == self.REGEN:
-            self.state_frame = 9
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
 
-        self.frame = (self.frame + 1) % self.state_frame
+        return True
 
-    def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 96, 625, 96, 100, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 124, 525, 124, 100, 300 + self.x+11, 205+2)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 90, 415, 90, 110, 300 + self.x+14, 205)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 110, 305, 110, 110, 300 + self.x+6, 205+4)
-        elif self.state == self.REGEN:
-            self.image.clip_draw(self.frame * 170, 0, 170, 175, 300 + self.x+11, 205)
+    def attack_collide(self, target):
+        left_self, bottom_self, right_self, top_self = self.get_hit_bb()
+        left_target, bottom_target, right_target, top_target = target.get_attack_bb()
 
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
 
-class Friend_6:
-    image = None
-    MOVE,ATTACK,DIE,HIT = 0, 1, 2, 3
-
-    def __init__(self):
-        if Friend_6.image == None:
-            Friend_6.image = load_image('resource/friend/friend6.png')
-            self.x, self.y = 0, 0
-            self.frame = 0
-            self.state = self.MOVE
-
-    def update(self):
-        if self.state == self.MOVE:
-            self.state_frame = 6
-            #self.x += 7
-        elif self.state == self.ATTACK:
-            self.state_frame = 15
-        elif self.state == self.DIE:
-            self.state_frame = 6
-        elif self.state == self.HIT:
-            self.state_frame = 1
-
-        self.frame = (self.frame + 1) % self.state_frame
-
-    def draw(self):
-        if self.state == self.MOVE:
-            self.image.clip_draw(self.frame * 144, 590, 144, 130, 300 + self.x , 205)
-        elif self.state == self.ATTACK:
-            self.image.clip_draw(self.frame * 153, 440, 153, 145, 300 + self.x+2, 205+5)
-        elif self.state == self.DIE:
-            self.image.clip_draw(self.frame * 170, 320, 170, 120, 300 + self.x, 205-20)
-        elif self.state == self.HIT:
-            self.image.clip_draw(self.frame * 180, 190, 180, 130, 300 + self.x-20, 205)
+        return True
