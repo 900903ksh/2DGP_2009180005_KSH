@@ -1,151 +1,178 @@
 from pico2d import *
+import random
 
-running = None
+mc_data_file = open('data/main_character_data.txt', 'r')
+mc_data = json.load(mc_data_file)
+mc_data_file.close()
 
-class Main_Character:
+stage_data_file = open('data/stage_data.txt', 'r')
+stage_data = json.load(stage_data_file)
+stage_data_file.close()
+
+class MainCharacter:
     image = None
 
-    STAND_RIGHT, STAND_LEFT, MOVE_RIGHT, MOVE_LEFT, MOTION1, MOTION2, MOTION3, MOTION4, \
-    MOTION5, DIE_RIGHT, DIE_LEFT, HIT_RIGHT, HIT_LEFT = 0,1,2,3,4,5,6,7,8,9,10,11,12
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 6
+
+    PIXEL_PER_METER = (10.0 / 1.1)                             # 10 pixel 110 cm
+    RUN_SPEED_KMPH = 50
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    STAND_RIGHT, STAND_LEFT, MOVE_RIGHT, MOVE_LEFT = 'STAND_RIGHT', 'STAND_LEFT', 'MOVE_RIGHT', 'MOVE_LEFT'
+    SKILL1, SKILL2, ATTACK, SUMMON, ABSORB = 'SKILL1', 'SKILL2', 'ATTACK', 'SUMMON', 'ABSORB'
+    DIE_RIGHT, DIE_LEFT, HIT_RIGHT, HIT_LEFT = 'DIE_RIGHT', 'DIE_LEFT', 'HIT_RIGHT', 'HIT_LEFT'
+
     def __init__(self):
-        if Main_Character.image == None:
-            Main_Character.image = load_image('resource/friend/main_character_0.png')
-
-        #self.image=load_image('resource/friend/main_character_0.png')
-        self.x, self.y = 0, 230
-        self.frame = 0
         self.state = self.STAND_RIGHT
+        self.hp = mc_data['hp']
+        self.damage = mc_data['damage']
+        self.image = load_image(mc_data['image'])
+        self.x, self.y = random.randint(100,300), stage_data['stage2']['bottom'] + mc_data['pivotY']
 
-    def update(self):
-        if self.state == self.MOVE_RIGHT:
-            self.x += 7
-        if self.state == self.MOVE_LEFT:
-            self.x -= 7
-        if self.state == self.STAND_RIGHT or self.state == self.MOVE_RIGHT\
-            or self.state == self.STAND_LEFT or self.state == self.MOVE_LEFT:
-            self.state_frame = 8
-        elif self.state == self.MOTION1 or self.state == self.MOTION2:
-            self.state_frame = 13
-        elif self.state == self.MOTION3:
-            self.state_frame = 9
-        elif self.state == self.MOTION4 or self.state == self.MOTION5:
-            self.state_frame = 12
-        elif self.state == self.DIE_RIGHT or self.state == self.DIE_LEFT:
-            self.state_frame = 9
-        elif self.state == self.HIT_RIGHT or self.state == self.HIT_LEFT:
-            self.state_frame = 1
+        self.game_time = 0
 
-        self.frame = (self.frame + 1) % self.state_frame
+        self.frame = 0
+        self.total_frame = 0
+        self.state_frame = mc_data[self.state]['frame']
 
-        if self.state != self.HIT_RIGHT and self.state != self.HIT_LEFT and \
-            self.state != self.MOVE_RIGHT and self.state != self.MOVE_LEFT and self.state != self.STAND_LEFT:
-            if self.frame == 0:
-                self.state = self.STAND_RIGHT
+        self.past_state = None
+        self.current_state = None
+        self.key_lock = False
+        self.left_key_pressed = False
+        self.right_key_pressed = False
+
+    def update(self, frame_time):
+        self.change_state()
+        self.total_frame += MainCharacter.FRAMES_PER_ACTION * MainCharacter.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % self.state_frame
+        self.state_frame = mc_data[self.state]['frame']
+        self.handle_state[self.state](self, frame_time)
 
     def draw(self):
-        if self.state == self.STAND_RIGHT or self.state == self.MOVE_RIGHT:
-            self.image.clip_draw(self.frame * 204, 3760, 204, 287, 300 + self.x, self.y)
-        elif self.state == self.STAND_LEFT or self.state == self.MOVE_LEFT:
-            self.image.clip_draw(self.frame * 204, 3463, 204, 287, 300 + self.x, self.y)
-        elif self.state == self.MOTION1:
-            self.image.clip_draw(self.frame * 404, 3093, 404, 365, 300 + self.x + 50, self.y + 39)
-        elif self.state == self.MOTION2:
-            self.image.clip_draw(self.frame * 335, 2735, 335, 348, 300 + self.x + 14, self.y + 37)
-        elif self.state == self.MOTION3:
-            self.image.clip_draw(self.frame * 265, 2409, 265, 316, 300 + self.x + 35, self.y + 14)
-        elif self.state == self.MOTION4:
-            self.image.clip_draw(self.frame * 277, 2053, 277, 341, 300 + self.x - 16, self.y + 36)
-        elif self.state == self.MOTION5:
-            self.image.clip_draw(self.frame * 281, 1746, 281, 297, 300 + self.x - 18, self.y + 14)
-        elif self.state == self.DIE_RIGHT:
-            self.image.clip_draw(self.frame * 338, 1402, 338, 334, 300 + self.x - 26, self.y + 21)
-        elif self.state == self.DIE_LEFT:
-            self.image.clip_draw(self.frame * 338, 1058, 338, 334, 300 + self.x + 26, self.y + 21)
-        elif self.state == self.HIT_RIGHT:
-            self.image.clip_draw(self.frame * 255, 761, 255, 287, 300 + self.x - 26, self.y + 21)
-        elif self.state == self.HIT_LEFT:
-            self.image.clip_draw(self.frame * 255, 464, 255, 287, 300 + self.x + 26, self.y + 21)
+        self.image.clip_draw(self.frame * mc_data[self.state]['left'], mc_data[self.state]['bottom'],\
+                             mc_data[self.state]['width'], mc_data[self.state]['height'],\
+                             self.x + mc_data[self.state]['plusX'], self.y + mc_data[self.state]['plusY'])
 
     def handle_events(self,event):
-        global running
+        if self.key_lock == False:
+            if (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
+                self.state = self.MOVE_RIGHT
+            elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
+                if self.state in (self.MOVE_RIGHT,):
+                    self.state = self.STAND_RIGHT
 
-        # events = get_events()
-        # for event in events:
-        #     if event.type == SDL_QUIT:
-        #         running = False
-        #     elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-        #         running = False
-        if (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
+                self.state = self.MOVE_LEFT
+            elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
+                if self.state in (self.MOVE_LEFT,):
+                    self.state = self.STAND_LEFT
+
+            elif (event.type, event.key) in ((SDL_KEYDOWN, SDLK_1), (SDL_KEYDOWN, SDLK_2), (SDL_KEYDOWN, SDLK_3),
+                                             (SDL_KEYDOWN, SDLK_4), (SDL_KEYDOWN, SDLK_5), (SDL_KEYDOWN, SDLK_6)):
+                self.state = self.SUMMON
+                self.key_lock_func()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
+                self.state = self.ATTACK
+                self.key_lock_func()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_s):
+                self.state = self.SKILL1
+                self.key_lock_func()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_d):
+                self.state = self.SKILL2
+                self.key_lock_func()
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_2):
+                self.state = self.ABSORB
+                self.key_lock_func()
+        pass
+
+    def handle_stand_right(self, frame_time):
+        pass
+
+    def handle_stand_left(self, frame_time):
+        pass
+
+    def handle_move_right(self, frame_time):
+        self.x += self.RUN_SPEED_PPS * frame_time
+
+    def handle_move_left(self, frame_time):
+        self.x -= self.RUN_SPEED_PPS * frame_time
+
+    def handle_skill1(self, frame_time):
+        if self.total_frame > self.state_frame:
             self.state = self.STAND_RIGHT
-        elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
-            self.state = self.STAND_LEFT
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
-            self.state = self.MOVE_RIGHT
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
-            self.state = self.MOVE_LEFT
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_DOWN):
+            self.key_unlock_func()
+        pass
+
+    def handle_skill2(self, frame_time):
+        if self.total_frame > self.state_frame:
             self.state = self.STAND_RIGHT
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
-            self.state = self.MOTION1
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
-            self.state = self.MOTION2
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
-            self.state = self.MOTION3
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_r):
-            self.state = self.MOTION4
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_t):
-            self.state = self.MOTION5
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
-            self.state = self.DIE_RIGHT
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_s):
-            self.state = self.DIE_LEFT
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_d):
-            self.state = self.HIT_RIGHT
-            self.frame = 0
-        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_f):
-            self.state = self.HIT_LEFT
-            self.frame = 0
+            self.key_unlock_func()
+
+        pass
+
+    def handle_attack(self, frame_time):
+        if self.total_frame > self.state_frame:
+            self.state = self.STAND_RIGHT
+            self.key_unlock_func()
+        pass
+
+    def handle_summon(self, frame_time):
+        if SDL_KEYDOWN == SDLK_1:
+            print("뻐킹에쏠")
+        if self.total_frame > self.state_frame:
+            self.state = self.STAND_RIGHT
+            self.key_unlock_func()
+        pass
+
+    def handle_absorb(self, frame_time):
+        if self.total_frame > self.state_frame:
+            self.state = self.STAND_RIGHT
+            self.key_unlock_func()
+        pass
+
+    def handle_die_right(self, frame_time):
+        pass
+
+    def handle_die_left(self, frame_time):
+        pass
+
+    def handle_hit_right(self, frame_time):
+        pass
+
+    def handle_hit_left(self, frame_time):
+        pass
+
+    handle_state = {
+        STAND_RIGHT : handle_stand_right,
+        STAND_LEFT  : handle_stand_left,
+        MOVE_RIGHT  : handle_move_right,
+        MOVE_LEFT   : handle_move_left,
+        SKILL1      : handle_skill1,
+        SKILL2      : handle_skill2,
+        ATTACK      : handle_attack,
+        SUMMON      : handle_summon,
+        ABSORB      : handle_absorb,
+        DIE_RIGHT   : handle_die_right,
+        DIE_LEFT    : handle_die_left,
+        HIT_RIGHT   : handle_hit_right,
+        HIT_LEFT    : handle_hit_left
+    }
+
+    def change_state(self):
+        if self.state != self.current_state:
+            self.past_state = self.current_state
+            self.current_state = self.state
+            self.state_frame = mc_data[self.state]['frame']
+            self.total_frame = 0.0
+            self.game_time = 0.0
+
+    def key_lock_func(self):
+        self.key_lock = True
+    def key_unlock_func(self):
+        self.key_lock = False
 
 
-
-def main():
-
-    open_canvas(1200,600)
-    mc = Main_Character()
-
-    #boss = load_image('resource/enemy/Boss/Boss_Stand.png')#
-    #boss_l_h = load_image('resource/enemy/Boss/Boss_Left_Hand_Stand.png')#
-    #boss_r_h = load_image('resource/enemy/Boss/Boss_Right_Hand_Stand.png')#
-
-    global frame_bg
-
-    global running
-    running = True
-    while running:
-
-        mc.handle_events()
-
-        mc.update()
-        clear_canvas()
-
-        #boss.clip_draw(0,0,850,590,700,320)#
-        #boss_l_h.clip_draw(0,0,285,215, 370, 130)#
-        #boss_r_h.clip_draw(0,0,250,215, 950, 130)#
-
-        mc.draw()
-
-        update_canvas()
-
-        delay(0.07)
-
-    close_canvas()
-
-if __name__ == '__main__':
-    main()
