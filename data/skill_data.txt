@@ -1,0 +1,13 @@
+{
+	"skill1" : {
+		"image": "resource/skill/skill1.png",
+		"damage": 2000,
+		"draw": { "frame": 12, "left": 404, "bottom": 326, "width": 404, "height": 326, "xpos": 450, "ypos": 400, "xsize": 800, "ysize": 800  } },
+
+	"skill2" : {
+		"image": "resource/skill/skill2.png",
+		"damage": 2000,
+		"SUMMON": { "frame": 18, "left": 334, "bottom":   0, "width": 334, "height": 375, "xpos": 450, "ypos": 416, "xsize": 700, "ysize": 800 },
+		"ATTACK": { "frame": 15, "left": 334, "bottom": 389, "width": 334, "height": 356, "xpos": 450, "ypos": 390, "xsize": 700, "ysize": 769 },
+		"DIE"   : { "frame":  9, "left": 334, "bottom": 770, "width": 334, "height": 171, "xpos": 450, "ypos": 530, "xsize": 700, "ysize": 369 } }
+}
