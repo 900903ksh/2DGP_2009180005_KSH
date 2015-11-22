@@ -1,9 +1,10 @@
 from pico2d import *
+import image
 import random
 
-friend_data_file = open('data/friend_data.txt', 'r')
-friend_data = json.load(friend_data_file)
-friend_data_file.close()
+enemy_data_file = open('data/friend_data.txt', 'r')
+enemy_data = json.load(enemy_data_file)
+enemy_data_file.close()
 
 stage_data_file = open('data/stage_data.txt', 'r')
 stage_data = json.load(stage_data_file)
@@ -17,84 +18,313 @@ class Friend:
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
 
-    MOVE, ATTACK, DIE, HIT = 'MOVE', 'ATTACK', 'DIE', 'HIT'
+    STAND, MOVE, ATTACK, DIE, HIT, REGEN = 'STAND', 'MOVE', 'ATTACK', 'DIE', 'HIT', 'REGEN'
 
-    def __init__(self, name):
+    def __init__(self, name, x_pos):
         self.name = name
-        self.state = self.MOVE
-        self.total_frame = 0.0
-        self.image = load_image(friend_data[name]['image'])
-        self.x, self.y = 0, stage_data['stage2']['bottom'] + friend_data[name]['pivotY']
-        self.hp = friend_data[name]['hp']
-        self.damage = friend_data[name]['damage']
-        self.frame = 0
-        self.state_frame = friend_data[name][self.state]['frame']
+        self.state = self.REGEN
+        self.hp = enemy_data[name]['hp']
+        self.damage = enemy_data[name]['damage']
+        for i in image.imageList:
+            if i.name == name:
+                self.image = i.image
 
-    def update(self, frame_time):
+        self.type = enemy_data[name]['type']
+        self.x, self.y = x_pos, stage_data['stage1']['bottom'] + enemy_data[name]['pivotY']
+
+        self.game_time = 0
+
+        self.frame = 0
+        self.total_frame = 0
+        self.state_frame = enemy_data[name][self.state]['frame']
+        self.attack_frame = enemy_data[self.name]['attack_frame']
+
+        self.past_state = None
+        self.current_state = None
+        self.die_check = False
+        self.collide_check = False
+        self.attack_check = False
+        self.hit_check = False
+
+        self.target_name = None
+        self.target_index = None
+
+        self.effect_on = False
+        self.effect_frame, self.effect_total_frame, self.target_effect_frame, self.effect_pos = 0, 0, 0, 0
+        self.effect_left, self.effect_right, self.effect_width, self.effect_height = 0, 0, 0, 0
+        self.effect_image = None
+
+    def update(self, frame_time, targetList):
+        self.change_state()
+        self.collide_check_func(targetList)
+        self.game_time += frame_time
         self.total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % self.state_frame
-        self.handle_state[self.state](self, frame_time)
-
-
+        self.handle_state[self.state](self, frame_time, targetList)
+        if self.effect_on == True:
+            self.effect_total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
+            self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
 
     def draw(self):
-        self.image.clip_draw(self.frame * friend_data[self.name][self.state]['left'], friend_data[self.name][self.state]['bottom'],\
-                             friend_data[self.name][self.state]['width'], friend_data[self.name][self.state]['height'],\
-                             self.x + friend_data[self.name][self.state]['plusX'], self.y + friend_data[self.name][self.state]['plusY'])
-        self.draw_bb()
+        self.image.clip_draw(self.frame * enemy_data[self.name][self.state]['left'], enemy_data[self.name][self.state]['bottom'],
+                             enemy_data[self.name][self.state]['width'], enemy_data[self.name][self.state]['height'],
+                             self.x + enemy_data[self.name][self.state]['plusX'], self.y + enemy_data[self.name][self.state]['plusY'])
 
-    def handle_move(self, frame_time):
-        self.state_frame = friend_data[self.name][self.state]['frame']
-        self.x += self.distance() * frame_time
-        pass
+        # self.draw_hit_bb()
+        # self.draw_attack_bb()
 
-    def handle_attack(self, frame_time):
-        self.state_frame = friend_data[self.name][self.state]['frame']
-        pass
+        if self.effect_on == True:
+            if self.effect_image != None:
+                self.effect_image.clip_draw(self.effect_frame * self.effect_left, self.effect_right, self.effect_width,
+                                            self.effect_height, self.x, stage_data['stage1']['bottom'] + self.effect_pos)
 
-    def handle_die(self, frame_time):
-        self.state_frame = friend_data[self.name][self.state]['frame']
-        pass
+                if self.effect_total_frame >= self.target_effect_frame:
+                    self.effect_frame = 0
+                    self.effect_total_frame = 0
+                    self.effect_on = False
 
-    def handle_hit(self, frame_time):
-        self.state_frame = friend_data[self.name][self.state]['frame']
-        pass
+    def handle_regen(self, frame_time, targetList):
+        if self.total_frame >= self.state_frame:
+            self.state = self.STAND
+
+    def handle_stand(self, frame_time, targetList):
+        if self.past_state == self.ATTACK:
+            if self.game_time > 2:
+                if self.collide_check == True:
+                    self.state = self.ATTACK
+                    self.attack_check = True
+                elif self.collide_check == False:
+                    self.state = self.MOVE
+            elif self.hit_check == True:
+                self.state = self.HIT
+        else:
+            if self.collide_check == True:
+                    self.state = self.ATTACK
+                    self.attack_check = True
+
+            elif self.hit_check == True:
+                self.state = self.HIT
+
+            elif self.collide_check == False:
+                self.state = self.MOVE
+
+    def handle_move(self, frame_time, targetList):
+        if self.hit_check == True:
+            self.state = self.HIT
+        elif self.collide_check == True:
+            self.state = self.ATTACK
+            self.attack_check = True
+        else:
+            self.x += self.speed() * frame_time
+
+    def handle_attack(self, frame_time, targetList):
+        # self.hit_check = False ##이 부분을 넣으면 attack 도중에 맞았을 경우 hit 으로 넘어가지 않고 hp만 감소
+                                 ##이 부분을 빼면 attack이 끝나면 hit 으로 넘어가게 됨
+        if self.total_frame >= self.state_frame:
+            self.state = self.STAND
+            self.collide_check = False
+        elif self.frame == self.attack_frame and self.attack_check == True:
+            if targetList != []:
+                if self.target_index < len(targetList):
+                    if self.target_name == targetList[self.target_index].name:
+                        targetList[self.target_index].hit(self.damage, self.get_effect())
+                        self.attack_check = False
+
+    def handle_die(self, frame_time, targetList):
+        if self.total_frame >= self.state_frame:
+            self.die_check = True
+
+    def handle_hit(self, frame_time, targetList):
+        self.x -= frame_time*30
+        if self.game_time > 0.3:
+            self.state = self.past_state
+            self.hit_check = False
 
     handle_state = {
+        REGEN : handle_regen,
+        STAND : handle_stand,
         MOVE: handle_move,
         ATTACK: handle_attack,
         DIE: handle_die,
         HIT: handle_hit
     }
+    
+    def hit(self, damage, effect):
+        self.effect_on = True
+        self.effect_left, self.effect_right, self.effect_width, self.effect_height,\
+        self.target_effect_frame, self.effect_pos, self.effect_image = effect
 
-    def distance(self):
+        self.hp -= damage
+        if self.hp <= 0:
+            self.state = self.DIE
+        else:
+            self.hit_check = True
+
+    def skill_hit(self, damage):
+        self.hp -= damage
+        self.state = self.HIT
+        if self.hp <= 0:
+            self.state = self.DIE
+
+    def change_state(self):
+        if self.state != self.current_state:
+            self.past_state = self.current_state
+            self.current_state = self.state
+            self.state_frame = enemy_data[self.name][self.state]['frame']
+            self.total_frame = 0.0
+            self.game_time = 0.0
+
+    def speed(self):
         PIXEL_PER_METER = (10.0 / 1.1)                             # 10 pixel 110 cm
-        RUN_SPEED_KMPH = friend_data[self.name]['speed']
+        RUN_SPEED_KMPH = enemy_data[self.name]['speed']
         RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
         RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
         RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
         return RUN_SPEED_PPS
 
+    def get_hit_bb(self):
+            return self.x - enemy_data[self.name]['hit_bb_left'], \
+                    self.y - enemy_data[self.name]['hit_bb_bottom'],\
+                    self.x + enemy_data[self.name]['hit_bb_right'], \
+                    self.y + enemy_data[self.name]['hit_bb_height']
+
+    def get_attack_bb(self):
+        if self.type == 'long_distance':
+            return self.x - enemy_data[self.name]['hit_bb_left'], \
+                    self.y - enemy_data[self.name]['hit_bb_bottom'],\
+                    self.x + enemy_data[self.name]['hit_bb_right'] + enemy_data[self.name]['attack_distance'], \
+                    self.y + enemy_data[self.name]['hit_bb_height']
+        else:
+            return self.x - enemy_data[self.name]['hit_bb_left'], \
+                    self.y - enemy_data[self.name]['hit_bb_bottom'],\
+                    self.x + enemy_data[self.name]['hit_bb_right'], \
+                    self.y + enemy_data[self.name]['hit_bb_height']
+
+    def get_effect(self):
+        return enemy_data[self.name]['EFFECT']['left'],\
+                enemy_data[self.name]['EFFECT']['bottom'],\
+                enemy_data[self.name]['EFFECT']['width'],\
+                enemy_data[self.name]['EFFECT']['height'],\
+                enemy_data[self.name]['EFFECT']['frame'],\
+                enemy_data[self.name]['EFFECT']['pos'], self.image
+
+
+    def draw_hit_bb(self):
+        draw_rectangle(*self.get_hit_bb())
+
+    def draw_attack_bb(self):
+        draw_rectangle(*self.get_attack_bb())
+
+    def collide(self, self_bb, target_bb):
+        left_self, bottom_self, right_self, top_self = self_bb
+        left_target, bottom_target, right_target, top_target = target_bb
+
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
+
+        return True
+
+    def collide_check_func(self, targetList):
+        if self.collide_check == False:
+            for target in targetList:
+                if target.state != target.DIE:
+                    if self.collide(self.get_attack_bb(), target.get_hit_bb()) == True:
+                        if target.state != target.DIE:
+                            self.target_name = target.name
+                            self.target_index = targetList.index(target)
+                            self.collide_check = True
+                            return
+
+
+class Spirit:
+    image = None
+    MOVE_LEFT, MOVE_RIGHT, DIE_LEFT, DIE_RIGHT = 'MOVE_LEFT', 'MOVE_RIGHT', 'DIE_LEFT', 'DIE_RIGHT'
+
+    TIME_PER_ACTION = 0.5
+    ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+    FRAMES_PER_ACTION = 6
+
+    PIXEL_PER_METER = (10.0 / 1.1)                             # 10 pixel 110 cm
+    RUN_SPEED_KMPH = enemy_data['Spirit']['speed']
+    RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+    RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+    RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+    def __init__(self, xpos):
+        self.center = xpos
+        self.x, self.y = xpos, stage_data['stage1']['bottom'] + enemy_data['Spirit']['pivotY']
+        if random.randint(0,1) == 0:
+            self.state = self.MOVE_LEFT
+        else:
+            self.state = self.MOVE_RIGHT
+        self.frame = 0
+        self.total_frame = 0
+        self.state_frame = enemy_data['Spirit'][self.state]['frame']
+        self.die_check = False
+        if Spirit.image == None:
+            Spirit.image = load_image(enemy_data['Spirit']['image'])
+
+    def update(self, frame_time, mc):
+        self.total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
+        self.frame = int(self.total_frame) % self.state_frame
+        self.handle_state[self.state](self, frame_time)
+        if self.state != self.DIE_LEFT and self.state != self.DIE_RIGHT:
+            if self.collide(mc) == True:
+                mc.absorb_spirit()
+                print(mc.spirit)
+                if self.state == self.MOVE_LEFT:
+                    self.state = self.DIE_LEFT
+                    self.total_frame = 0
+                elif self.state == self.MOVE_RIGHT:
+                    self.state = self.DIE_RIGHT
+                    self.total_frame = 0
+
+    def draw(self):
+        self.image.clip_draw(self.frame * enemy_data['Spirit'][self.state]['left'], enemy_data['Spirit'][self.state]['bottom'],
+                             enemy_data['Spirit'][self.state]['width'], enemy_data['Spirit'][self.state]['height'],
+                             self.x + enemy_data['Spirit'][self.state]['plusX'], self.y + enemy_data['Spirit'][self.state]['plusY'])
+        # draw_rectangle(*self.get_bb())
+
     def get_bb(self):
-        return self.x - friend_data[self.name][self.state]['width']/2 + friend_data[self.name][self.state]['plusX'], \
-                self.y - friend_data[self.name][self.state]['height']/2 + friend_data[self.name][self.state]['plusY'],\
-                self.x + friend_data[self.name][self.state]['width']/2 + friend_data[self.name][self.state]['plusX'], \
-                self.y + friend_data[self.name][self.state]['height']/2 + friend_data[self.name][self.state]['plusY']
+            return self.x - enemy_data['Spirit']['bb_left'], \
+                    self.y - enemy_data['Spirit']['bb_bottom'],\
+                    self.x + enemy_data['Spirit']['bb_right'], \
+                    self.y + enemy_data['Spirit']['bb_height']
 
-    def draw_bb(self):
-        draw_rectangle(*self.get_bb())
-
-    def collide(self, target):
+    def collide(self, mc):
         left_self, bottom_self, right_self, top_self = self.get_bb()
-        left_target, bottom_target, right_target, top_target = target.get_bb()
+        left_target, bottom_target, right_target, top_target = mc.get_bb()
 
-        if self.state == self.MOVE:
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
 
-            if left_self > right_target : return False
-            if right_self < left_target : return False
-            if top_self < bottom_target : return False
-            if bottom_self > top_target : return False
+        return True
 
-            self.state = self.ATTACK
+    def handle_move_left(self, frame_time):
+        self.x -= self.RUN_SPEED_PPS * frame_time
+        if self.x < self.center - enemy_data['Spirit']['move_range']/2:
+            self.state = self.MOVE_RIGHT
 
-            return True
+    def handle_move_right(self, frame_time):
+        self.x += self.RUN_SPEED_PPS * frame_time
+        if self.x > self.center + enemy_data['Spirit']['move_range']/2:
+            self.state = self.MOVE_LEFT
+
+    def handle_die_left(self, frame_time):
+        if self.total_frame >= self.state_frame:
+            self.die_check = True
+
+    def handle_die_right(self, frame_time):
+        if self.total_frame >= self.state_frame:
+            self.die_check = True
+
+    handle_state = {
+        MOVE_LEFT  : handle_move_left,
+        MOVE_RIGHT : handle_move_right,
+        DIE_LEFT   : handle_die_left,
+        DIE_RIGHT  : handle_die_right
+    }
