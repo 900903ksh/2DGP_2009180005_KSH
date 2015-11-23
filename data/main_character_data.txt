@@ -1,6 +1,7 @@
 {
-	"image" : "resource/friend/MainCharacter.png", "pivotX" : 0, "pivotY" : 130,
-	"speed" : 20, "hp" : 2000, "damage" : 200, "attack_frame":4,
+	"image" : "resource/friend/MainCharacter.png", "pivotX" : 0, "pivotY" : 130, "reattack_time": 1,
+	"xpos": 200, "speed" : 50, "hp" : 800, "damage" : 30, "spirit_amount" : 2000, "attack_frame":4,
+	"summon_pos": 150, "bb_left": 70, "bb_bottom": 120, "bb_right": 60, "bb_height": 65,
 	"MOVE_LEFT"   : { "frame": 8, "left": 204, "bottom":3463, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },
 	"MOVE_RIGHT"  : { "frame": 8, "left": 204, "bottom":3760, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },
 	"STAND_LEFT"  : { "frame": 8, "left": 204, "bottom":3463, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },
@@ -9,9 +10,9 @@
 	"SKILL2"      : { "frame":13, "left": 335, "bottom":2735, "width": 335, "height": 348, "plusX": 14, "plusY": 37 },
 	"ATTACK"      : { "frame": 9, "left": 265, "bottom":2409, "width": 265, "height": 316, "plusX": 35, "plusY": 14 },
 	"SUMMON"      : { "frame":12, "left": 277, "bottom":2053, "width": 277, "height": 341, "plusX":-16, "plusY": 36 },
-	"ABSORB"      : { "frame":12, "left": 281, "bottom":1746, "width": 281, "height": 297, "plusX":-18, "plusY": 14 },
-	"DIE_LEFT"    : { "frame": 9, "left": 338, "bottom":1402, "width": 338, "height": 334, "plusX":-26, "plusY": 21 },
-	"DIE_RIGHT"   : { "frame": 9, "left": 338, "bottom":1058, "width": 338, "height": 334, "plusX":-26, "plusY": 21 },
-	"HIT_LEFT"    : { "frame": 1, "left": 255, "bottom": 761, "width": 255, "height": 287, "plusX":-26, "plusY": 21 },
-	"HIT_RIGHT"   : { "frame": 1, "left": 255, "bottom": 464, "width": 255, "height": 287, "plusX": 26, "plusY": 21 }
+	"HEAL"        : { "frame":12, "left": 281, "bottom":1746, "width": 281, "height": 297, "plusX":-18, "plusY": 14 },
+	"DIE_RIGHT"   : { "frame": 9, "left": 338, "bottom":1402, "width": 338, "height": 334, "plusX":-26, "plusY": 21 },
+	"DIE_LEFT"    : { "frame": 9, "left": 338, "bottom":1058, "width": 338, "height": 334, "plusX":-26, "plusY": 21 },
+	"HIT_RIGHT"   : { "frame": 1, "left": 255, "bottom": 761, "width": 255, "height": 287, "plusX":-26, "plusY": 21 },
+	"HIT_LEFT"    : { "frame": 1, "left": 255, "bottom": 464, "width": 255, "height": 287, "plusX": 26, "plusY": 21 }
 }

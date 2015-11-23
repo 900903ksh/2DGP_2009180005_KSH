@@ -1,0 +1,20 @@
+{
+	"Eregos" : "resource/friend/MainCharacter.png",
+
+	"SkelSoldier" : "resource/friend/Fnd1_SkelSoldier.png",
+	"SkelOfficer" : "resource/friend/Fnd2_SkelOfficer.png",
+	"SkelCommander" : "resource/friend/Fnd3_SkelCommander.png",
+	"SkelSpearknight" : "resource/friend/Fnd4_SkelSpearknight.png",
+	"Wraith" : "resource/friend/Fnd5_Wraith.png",
+	"MuscleStone" : "resource/friend/Fnd6_MuscleStone.png",
+
+
+	"Bulldog" : "resource/enemy/Emy1_Bulldog.png",
+	"Lycanthrope" : "resource/enemy/Emy2_Lycanthrope.png",
+	"CorruptedWyvern" : "resource/enemy/Emy3_CorruptedWyvern.png",
+	"CorruptedCornian" : "resource/enemy/Emy4_CorruptedCornian.png",
+	"DemonGargoyle" : "resource/enemy/Emy5_DemonGargoyle.png",
+	"JuniorBalrog" : "resource/enemy/Emy6_JuniorBalrog.png",
+	"CrimsonBalrog" : "resource/enemy/Emy7_CrimsonBalrog.png",
+	"BabyBalrog" : "resource/enemy/EmyBonus_BabyBalrog.png"
+}

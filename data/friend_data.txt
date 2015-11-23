@@ -1,8 +1,8 @@
 {
 	"SkelSoldier" : {
-		"image": "resource/friend/Fnd1_SkelSoldier.png", "pivotX" : 0, "pivotY" : 35,
-		"speed": 20, "hp": 200, "damage": 10, "attack_frame": 2, "type": "short_distance",
-		"hit_bb_left": 30, "hit_bb_bottom": 35, "hit_bb_right": 35, "hit_bb_height": 50,
+		"image": "resource/friend/Fnd1_SkelSoldier.png", "pivotX" : 0, "pivotY" : 35, "need_spirit": 20,
+		"speed": 20, "hp": 50, "damage": 10, "attack_frame": 2, "type": "short_distance",
+		"hit_bb_left": 30, "hit_bb_bottom": 35, "hit_bb_right": 35, "hit_bb_height": 50, "attack_delay": 2,
 		"EFFECT" : { "frame":2, "left":113, "bottom":  0, "width":113, "height":120, "pos": 30 },
 		"STAND"  : { "frame":4, "left": 93, "bottom":578, "width": 93, "height":110, "plusX":0, "plusY": 0 },
 		"MOVE"   : { "frame":4, "left": 95, "bottom":470, "width": 95, "height":110, "plusX":0, "plusY": 0 },
@@ -12,9 +12,9 @@
 		"REGEN"  : { "frame":6, "left": 95, "bottom":787, "width": 95, "height":110, "plusX":0, "plusY":-3 } },
 
 	"SkelOfficer" : {
-		"image": "resource/friend/Fnd2_SkelOfficer.png", "pivotX" : 0, "pivotY" : 45,
-		"speed": 20, "hp": 200, "damage": 10, "attack_frame": 4, "type": "short_distance",
-		"hit_bb_left": 30, "hit_bb_bottom": 45, "hit_bb_right": 35, "hit_bb_height": 50,
+		"image": "resource/friend/Fnd2_SkelOfficer.png", "pivotX" : 0, "pivotY" : 45, "need_spirit": 30,
+		"speed": 21, "hp": 100, "damage": 15, "attack_frame": 4, "type": "short_distance",
+		"hit_bb_left": 30, "hit_bb_bottom": 45, "hit_bb_right": 35, "hit_bb_height": 50, "attack_delay": 2,
 		"EFFECT" : { "frame":2, "left":113, "bottom":  0, "width":113, "height":120, "pos": 30 },
 		"STAND"  : { "frame":4, "left": 93, "bottom":605, "width": 93, "height":115, "plusX":0, "plusY": 0 },
 		"MOVE"   : { "frame":4, "left": 95, "bottom":490, "width": 95, "height":115, "plusX":0, "plusY": 0 },
@@ -24,9 +24,9 @@
 		"REGEN"  : { "frame":6, "left": 90, "bottom":790, "width": 90, "height":120, "plusX":2, "plusY":-4 } },
 
 	"SkelCommander" : {
-		"image": "resource/friend/Fnd3_SkelCommander.png", "pivotX" : 0, "pivotY" : 58,
-		"speed": 20, "hp": 200, "damage": 10, "attack_frame": 5, "type": "long_distance", "attack_distance" : 200,
-		"hit_bb_left": 50, "hit_bb_bottom": 60, "hit_bb_right": 45, "hit_bb_height": 70,
+		"image": "resource/friend/Fnd3_SkelCommander.png", "pivotX" : 0, "pivotY" : 58, "need_spirit": 40,
+		"speed": 30, "hp": 70, "damage": 20, "attack_frame": 5, "type": "long_distance", "attack_distance" : 200,
+		"hit_bb_left": 50, "hit_bb_bottom": 60, "hit_bb_right": 45, "hit_bb_height": 70, "attack_delay": 2,
 		"EFFECT" : { "frame": 2, "left":115, "bottom":  0, "width":115, "height":121, "pos": 50 },
 		"STAND"  : { "frame": 4, "left":131, "bottom":751, "width":131, "height":155, "plusX":  0, "plusY": 0 },
 		"MOVE"   : { "frame": 4, "left":140, "bottom":600, "width":140, "height":155, "plusX":  0, "plusY": 0 },
@@ -36,9 +36,9 @@
 		"REGEN"  : { "frame":11, "left":147, "bottom":915, "width":147, "height":155, "plusX":-13, "plusY": 5 } },
 
 	"SkelSpearknight" : {
-		"image": "resource/friend/Fnd4_SkelSpearknight.png", "pivotX" : 0, "pivotY" : 50,
-		"speed": 25, "hp": 200, "damage": 10, "attack_frame": 5, "type": "short_distance",
-		"hit_bb_left": 50, "hit_bb_bottom": 50, "hit_bb_right": 28, "hit_bb_height": 50,
+		"image": "resource/friend/Fnd4_SkelSpearknight.png", "pivotX" : 0, "pivotY" : 50, "need_spirit": 50,
+		"speed": 26, "hp": 150, "damage": 25, "attack_frame": 5, "type": "short_distance",
+		"hit_bb_left": 50, "hit_bb_bottom": 50, "hit_bb_right": 28, "hit_bb_height": 50, "attack_delay": 2,
 		"EFFECT" : { "frame": 6, "left":165, "bottom":  0, "width":165, "height":117, "pos": 40 },
 		"STAND"  : { "frame": 4, "left":144, "bottom":732, "width":144, "height":120, "plusX":  3, "plusY": 0 },
 		"MOVE"   : { "frame": 4, "left":155, "bottom":605, "width":155, "height":120, "plusX":  0, "plusY": 0 },
@@ -48,9 +48,9 @@
 		"REGEN"  : { "frame":10, "left":200, "bottom":916, "width":215, "height":155, "plusX":-32, "plusY":17 } },
 
 	"Wraith" : {
-		"image": "resource/friend/Fnd5_Wraith.png", "pivotX" : 0, "pivotY" : 45,
-		"speed": 23, "hp": 200, "damage": 10, "attack_frame": 10, "type": "long_distance", "attack_distance" : 450,
-		"hit_bb_left": 35, "hit_bb_bottom": 40, "hit_bb_right": 45, "hit_bb_height": 45,
+		"image": "resource/friend/Fnd5_Wraith.png", "pivotX" : 0, "pivotY" : 45, "need_spirit": 60,
+		"speed": 29, "hp": 15, "damage": 120, "attack_frame": 10, "type": "long_distance", "attack_distance" : 450,
+		"hit_bb_left": 35, "hit_bb_bottom": 40, "hit_bb_right": 45, "hit_bb_height": 45, "attack_delay": 2,
 		"EFFECT" : { "frame": 2, "left":115, "bottom":181, "width":110, "height":120, "pos": 45 },
 		"STAND"  : { "frame": 6, "left": 75, "bottom":740, "width": 75, "height":100, "plusX":10, "plusY":0 },
 		"MOVE"   : { "frame": 6, "left": 96, "bottom":625, "width": 96, "height":100, "plusX": 0, "plusY":0 },
@@ -60,9 +60,9 @@
 		"REGEN"  : { "frame": 9, "left":170, "bottom":  0, "width":170, "height":175, "plusX":11, "plusY":0 } },
 
 	"MuscleStone" : {
-		"image": "resource/friend/Fnd6_MuscleStone.png", "pivotX" : 0, "pivotY" : 52,
-		"speed": 18, "hp": 300, "damage": 10, "attack_frame": 7, "type": "long_distance", "attack_distance" : 300,
-		"hit_bb_left": 50, "hit_bb_bottom": 50, "hit_bb_right": 50, "hit_bb_height": 50,
+		"image": "resource/friend/Fnd6_MuscleStone.png", "pivotX" : 0, "pivotY" : 52, "need_spirit": 50,
+		"speed": 16, "hp": 250, "damage": 15, "attack_frame": 7, "type": "long_distance", "attack_distance" : 300,
+		"hit_bb_left": 50, "hit_bb_bottom": 50, "hit_bb_right": 50, "hit_bb_height": 50, "attack_delay": 2,
 		"EFFECT" : { "frame": 5, "left":114, "bottom":  0, "width":114, "height":190, "pos": 70 },
 		"STAND"  : { "frame": 6, "left":133, "bottom":720, "width":133, "height":130, "plusX":  0, "plusY":  0 },
 		"MOVE"   : { "frame": 6, "left":144, "bottom":590, "width":144, "height":130, "plusX":  0, "plusY":  0 },
@@ -73,7 +73,7 @@
 
 	"Spirit" : {
 		"image": "resource/friend/Spirit.png", "pivotX" : 0, "pivotY" : 37, "move_range": 100,
-		"speed": 12, "bb_left": 21, "bb_bottom": 32, "bb_right": 31, "bb_height": 29,
+		"speed": 12, "bb_left": 21, "bb_bottom": 32, "bb_right": 31, "bb_height": 29, "attack_delay": 2,
 		"MOVE_LEFT"  : { "frame": 6, "left": 64, "bottom": 316, "width": 64, "height": 80, "plusX": 0, "plusY": 0 },
 		"MOVE_RIGHT" : { "frame": 6, "left": 64, "bottom": 235, "width": 64, "height": 80, "plusX": 0, "plusY": 0 },
 		"DIE_LEFT"   : { "frame": 8, "left":104, "bottom": 100, "width":104, "height":110, "plusX":-7, "plusY":-5 },
