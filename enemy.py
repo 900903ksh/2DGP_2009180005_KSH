@@ -1,15 +1,14 @@
 from pico2d import *
-import image
+from etc import *
 import random
 
 enemy_data_file = open('data/enemy_data.txt', 'r')
 enemy_data = json.load(enemy_data_file)
 enemy_data_file.close()
 
-stage_data_file = open('data/stage_data.txt', 'r')
-stage_data = json.load(stage_data_file)
-stage_data_file.close()
-
+sound_data_file = open('data/sound_data.txt', 'r')
+sound_data = json.load(sound_data_file)
+sound_data_file.close()
 
 class Enemy:
     image = None
@@ -27,11 +26,9 @@ class Enemy:
         self.state = self.STAND
         self.hp = enemy_data[name]['hp']
         self.damage = enemy_data[name]['damage']
-        for i in image.imageList:
-            if i.name == name:
-                self.image = i.image
+        self.image = get_image(name)
         self.type = enemy_data[name]['type']
-        self.x, self.y = 1700, stage_data['stage1']['bottom'] + enemy_data[name]['pivotY']
+        self.x, self.y = stage_end(), stage_bottom() + enemy_data[name]['pivotY']
         self.game_time, self.frame, self.total_frame = 0, 0, 0
         self.state_frame = enemy_data[name][self.state]['frame']
         self.attack_frame = enemy_data[self.name]['attack_frame']
@@ -48,6 +45,12 @@ class Enemy:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height = 0, 0, 0, 0
         self.effect_image = None
 
+        self.attack_sound = get_unit_sound(self.name, 'attack')
+        self.attack_sound_check = False
+        self.hit_sound = get_unit_sound(self.name, 'hit')
+        self.die_sound = get_unit_sound(self.name, 'die')
+        self.die_sound_check = False
+
         Enemy.REGEN_TIME = enemy_data[name]['regen_time']
 
     def update(self, frame_time, targetList,mc):
@@ -62,15 +65,15 @@ class Enemy:
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
 
     def draw(self):
+        sx = self.x - self.bg.window_left
+
         self.image.clip_draw(self.frame * enemy_data[self.name][self.state]['left'], enemy_data[self.name][self.state]['bottom'],
                              enemy_data[self.name][self.state]['width'], enemy_data[self.name][self.state]['height'],
-                             self.x - self.bg.window_left + enemy_data[self.name][self.state]['plusX'], self.y + enemy_data[self.name][self.state]['plusY'])
-                            ###- self.bg.window_left
+                             sx + enemy_data[self.name][self.state]['plusX'], self.y + enemy_data[self.name][self.state]['plusY'])
         if self.effect_on == True:
             if self.effect_image != None:
                 self.effect_image.clip_draw(self.effect_frame * self.effect_left, self.effect_right, self.effect_width,
-                                            self.effect_height, self.x - self.bg.window_left, stage_data['stage1']['bottom'] + self.effect_pos)
-                                            ###- self.bg.window_left
+                                            self.effect_height, sx, stage_bottom() + self.effect_pos)
                 if self.effect_total_frame >= self.target_effect_frame:
                     self.effect_frame = 0
                     self.effect_total_frame = 0
@@ -103,12 +106,17 @@ class Enemy:
             self.attack_check = True
         else:
             self.x -= self.speed() * frame_time
+            self.x = clamp(0, self.x, self.bg.w)
 
     def handle_attack(self, frame_time, targetList, mc):
+        if self.attack_sound_check == False:
+            self.attack_sound.play()
+            self.attack_sound_check = True
         # self.hit_check = False
         if self.total_frame >= self.state_frame:
             self.state = self.STAND
             self.collide_check = False
+            self.attack_sound_check = False
         elif self.frame == self.attack_frame and self.attack_check == True:
             if self.target_name == 'mc':
                 mc.hit(self.damage, self.get_effect())
@@ -121,8 +129,12 @@ class Enemy:
                         self.attack_check = False
 
     def handle_die(self, frame_time, targetList, mc):
+        if self.die_sound_check == False:
+            self.die_sound.play()
+            self.die_sound_check = True
         if self.total_frame >= self.state_frame:
             self.die_check = True
+            self.die_sound_check = False
 
     def handle_hit(self, frame_time, targetList, mc):
         self.x += frame_time * 30
@@ -143,6 +155,8 @@ class Enemy:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height,\
         self.target_effect_frame, self.effect_pos, self.effect_image = effect
         self.hp -= damage
+        if self.hp >= 0:
+            self.hit_sound.play()
         if self.hp <= 0:
             self.state = self.DIE
         else:
@@ -151,6 +165,8 @@ class Enemy:
     def skill_hit(self, damage):
         self.hp -= damage
         self.state = self.HIT
+        if self.hp >= 0:
+            self.hit_sound.play()
         if self.hp <= 0:
             self.state = self.DIE
 

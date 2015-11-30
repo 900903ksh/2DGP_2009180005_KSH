@@ -1,14 +1,10 @@
 from pico2d import *
-import image
+from etc import *
 import random
 
 friend_data_file = open('data/friend_data.txt', 'r')
 friend_data = json.load(friend_data_file)
 friend_data_file.close()
-
-stage_data_file = open('data/stage_data.txt', 'r')
-stage_data = json.load(stage_data_file)
-stage_data_file.close()
 
 
 class Friend:
@@ -25,11 +21,9 @@ class Friend:
         self.state = self.REGEN
         self.hp = friend_data[name]['hp']
         self.damage = friend_data[name]['damage']
-        for i in image.imageList:
-            if i.name == name:
-                self.image = i.image
+        self.image = get_image(name)
         self.type = friend_data[name]['type']
-        self.x, self.y = x_pos, stage_data['stage1']['bottom'] + friend_data[name]['pivotY']
+        self.x, self.y = x_pos, stage_bottom() + friend_data[name]['pivotY']
         self.game_time, self.frame, self.total_frame = 0, 0, 0
         self.state_frame = friend_data[name][self.state]['frame']
         self.attack_frame = friend_data[self.name]['attack_frame']
@@ -46,6 +40,12 @@ class Friend:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height = 0, 0, 0, 0
         self.effect_image = None
 
+        self.attack_sound = get_unit_sound(name, 'attack')
+        self.attack_sound_check = False
+        self.hit_sound = get_unit_sound(name, 'hit')
+        self.die_sound = get_unit_sound(name, 'die')
+        self.die_sound_check = False
+
     def update(self, frame_time, targetList):
         self.change_state()
         self.collide_check_func(targetList)
@@ -58,15 +58,15 @@ class Friend:
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
 
     def draw(self):
+        sx = self.x - self.bg.window_left
+
         self.image.clip_draw(self.frame * friend_data[self.name][self.state]['left'], friend_data[self.name][self.state]['bottom'],
                              friend_data[self.name][self.state]['width'], friend_data[self.name][self.state]['height'],
-                             self.x - self.bg.window_left + friend_data[self.name][self.state]['plusX'], self.y + friend_data[self.name][self.state]['plusY'])
-                            ###- self.bg.window_left
+                             sx + friend_data[self.name][self.state]['plusX'], self.y + friend_data[self.name][self.state]['plusY'])
         if self.effect_on == True:
             if self.effect_image != None:
                 self.effect_image.clip_draw(self.effect_frame * self.effect_left, self.effect_right, self.effect_width,
-                                            self.effect_height, self.x - self.bg.window_left, stage_data['stage1']['bottom'] + self.effect_pos)
-                                            ###- self.bg.window_left
+                                            self.effect_height, sx, stage_bottom() + self.effect_pos)
                 if self.effect_total_frame >= self.target_effect_frame:
                     self.effect_frame = 0
                     self.effect_total_frame = 0
@@ -105,12 +105,16 @@ class Friend:
             self.attack_check = True
         else:
             self.x += self.speed() * frame_time
+            self.x = clamp(0, self.x, self.bg.w)
 
     def handle_attack(self, frame_time, targetList):
-        # self.hit_check = False
+        if self.attack_sound_check == False:
+            self.attack_sound.play()
+            self.attack_sound_check = True
         if self.total_frame >= self.state_frame:
             self.state = self.STAND
             self.collide_check = False
+            self.attack_sound_check = False
         elif self.frame == self.attack_frame and self.attack_check == True:
             if targetList != []:
                 if self.target_index < len(targetList):
@@ -119,6 +123,9 @@ class Friend:
                         self.attack_check = False
 
     def handle_die(self, frame_time, targetList):
+        if self.die_sound_check == False:
+            self.die_sound.play()
+            self.die_sound_check = True
         if self.total_frame >= self.state_frame:
             self.die_check = True
 
@@ -142,6 +149,8 @@ class Friend:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height,\
         self.target_effect_frame, self.effect_pos, self.effect_image = effect
         self.hp -= damage
+        if self.hp >= 0:
+            self.hit_sound.play()
         if self.hp <= 0:
             self.state = self.DIE
         else:
@@ -237,7 +246,7 @@ class Spirit:
 
     def __init__(self, xpos):
         self.center = xpos
-        self.x, self.y = xpos, stage_data['stage1']['bottom'] + friend_data['Spirit']['pivotY']
+        self.x, self.y = xpos, stage_bottom() + friend_data['Spirit']['pivotY']
         if random.randint(0,1) == 0:
             self.state = self.MOVE_LEFT
         else:
@@ -265,10 +274,11 @@ class Spirit:
                     self.total_frame = 0
 
     def draw(self):
+        sx = self.x - self.bg.window_left
+
         self.image.clip_draw(self.frame * friend_data['Spirit'][self.state]['left'], friend_data['Spirit'][self.state]['bottom'],
                              friend_data['Spirit'][self.state]['width'], friend_data['Spirit'][self.state]['height'],
-                             self.x - self.bg.window_left + friend_data['Spirit'][self.state]['plusX'], self.y + friend_data['Spirit'][self.state]['plusY'])
-                            ###- self.bg.window_left
+                             sx + friend_data['Spirit'][self.state]['plusX'], self.y + friend_data['Spirit'][self.state]['plusY'])
 
     def get_bb(self):
             return self.x - friend_data['Spirit']['bb_left'], \
@@ -294,6 +304,7 @@ class Spirit:
 
     def handle_move_right(self, frame_time):
         self.x += self.RUN_SPEED_PPS * frame_time
+        self.x = clamp(0, self.x, self.bg.w)
         if self.x > self.center + friend_data['Spirit']['move_range']/2:
             self.state = self.MOVE_LEFT
 

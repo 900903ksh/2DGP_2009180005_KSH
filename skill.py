@@ -36,9 +36,11 @@ class Attack:
             return False
 
     def draw(self):
+        sx = self.x - self.bg.window_left
+
         self.image.clip_draw(self.frame * skill_data['attack']['draw']['left'], skill_data['attack']['draw']['bottom'],
                              skill_data['attack']['draw']['width'], skill_data['attack']['draw']['height'],
-                             self.x - self.bg.window_left, self.y + skill_data['attack']['draw']['ypos']) ###
+                             sx, self.y + skill_data['attack']['draw']['ypos']) ###
 
     def get_bb(self):
         return self.x - skill_data['attack']['attack_range_left'],\
