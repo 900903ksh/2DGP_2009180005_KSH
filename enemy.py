@@ -50,6 +50,7 @@ class Enemy:
         self.hit_sound = get_unit_sound(self.name, 'hit')
         self.die_sound = get_unit_sound(self.name, 'die')
         self.die_sound_check = False
+        self.font = get_font(20)
 
         Enemy.REGEN_TIME = enemy_data[name]['regen_time']
 
@@ -78,6 +79,8 @@ class Enemy:
                     self.effect_frame = 0
                     self.effect_total_frame = 0
                     self.effect_on = False
+
+        self.font.draw(sx, self.y + enemy_data[self.name]['hit_bb_height'],"%d"%self.hp,(255,0,0))
 
     def handle_stand(self, frame_time, targetList, mc):
         if self.past_state == self.ATTACK:
@@ -159,6 +162,7 @@ class Enemy:
         if self.hp >= 0:
             self.hit_sound.play()
         if self.hp <= 0:
+            self.hp = 0
             self.state = self.DIE
         else:
             self.hit_check = True
@@ -169,6 +173,7 @@ class Enemy:
         if self.hp >= 0:
             self.hit_sound.play()
         if self.hp <= 0:
+            self.hp = 0
             self.state = self.DIE
 
     def change_state(self):
@@ -233,11 +238,11 @@ class Enemy:
             for target in targetList:
                 if target.state != target.DIE:
                     if self.collide(self.get_attack_bb(), target.get_hit_bb()) == True:
-                        if target.state != target.DIE:
-                            self.target_name = target.name
-                            self.target_index = targetList.index(target)
-                            self.collide_check = True
-                            return
+                        # if target.state != target.DIE:
+                        self.target_name = target.name
+                        self.target_index = targetList.index(target)
+                        self.collide_check = True
+                        return
 
     def set_background(self, bg):
         self.bg = bg

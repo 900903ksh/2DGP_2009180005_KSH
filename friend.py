@@ -46,6 +46,8 @@ class Friend:
         self.die_sound = get_unit_sound(name, 'die')
         self.die_sound_check = False
 
+        self.font = get_font(20)
+
     def update(self, frame_time, targetList):
         self.change_state()
         self.collide_check_func(targetList)
@@ -56,6 +58,7 @@ class Friend:
         if self.effect_on == True:
             self.effect_total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
+
 
     def draw(self):
         sx = self.x - self.bg.window_left
@@ -71,6 +74,8 @@ class Friend:
                     self.effect_frame = 0
                     self.effect_total_frame = 0
                     self.effect_on = False
+
+        self.font.draw(sx, self.y + friend_data[self.name]['hit_bb_height'],"%d"%self.hp,(0,84,255))
 
     def handle_regen(self, frame_time, targetList):
         if self.total_frame >= self.state_frame:
@@ -152,6 +157,7 @@ class Friend:
         if self.hp >= 0:
             self.hit_sound.play()
         if self.hp <= 0:
+            self.hp = 0
             self.state = self.DIE
         else:
             self.hit_check = True
@@ -160,6 +166,7 @@ class Friend:
         self.hp -= damage
         self.state = self.HIT
         if self.hp <= 0:
+            self.hp = 0
             self.state = self.DIE
 
     def change_state(self):
@@ -220,13 +227,13 @@ class Friend:
             for target in targetList:
                 if target.state != target.DIE:
                     if self.collide(self.get_attack_bb(), target.get_hit_bb()) == True:
-                        if target.state != target.DIE:
-                            self.target_name = target.name
-                            self.target_index = targetList.index(target)
-                            self.collide_check = True
-                            return
+                        # if target.state != target.DIE:
+                        self.target_name = target.name
+                        self.target_index = targetList.index(target)
+                        self.collide_check = True
+                        return
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
 
@@ -265,7 +272,6 @@ class Spirit:
         if self.state != self.DIE_LEFT and self.state != self.DIE_RIGHT:
             if self.collide(mc) == True:
                 mc.absorb_spirit()
-                print(mc.spirit_amount)
                 if self.state == self.MOVE_LEFT:
                     self.state = self.DIE_LEFT
                     self.total_frame = 0
@@ -323,5 +329,5 @@ class Spirit:
         DIE_RIGHT  : handle_die_right
     }
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
