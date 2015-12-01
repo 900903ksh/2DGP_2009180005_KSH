@@ -139,8 +139,9 @@ class Enemy:
     def handle_hit(self, frame_time, targetList, mc):
         self.x += frame_time * 30
         if self.game_time > 0.3:
-            self.state = self.past_state
+            self.state = self.MOVE
             self.hit_check = False
+            self.collide_check = False
 
     handle_state = {
         STAND : handle_stand,
@@ -238,7 +239,7 @@ class Enemy:
                             self.collide_check = True
                             return
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
 
