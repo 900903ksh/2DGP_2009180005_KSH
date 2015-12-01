@@ -1,14 +1,10 @@
 from pico2d import *
 from etc import *
-import random
 
 enemy_data_file = open('data/enemy_data.txt', 'r')
 enemy_data = json.load(enemy_data_file)
 enemy_data_file.close()
 
-sound_data_file = open('data/sound_data.txt', 'r')
-sound_data = json.load(sound_data_file)
-sound_data_file.close()
 
 class Enemy:
     image = None
@@ -115,7 +111,6 @@ class Enemy:
         if self.attack_sound_check == False:
             self.attack_sound.play()
             self.attack_sound_check = True
-        # self.hit_check = False
         if self.total_frame >= self.state_frame:
             self.state = self.STAND
             self.collide_check = False
@@ -231,18 +226,21 @@ class Enemy:
 
     def collide_check_func(self, targetList, mc):
         if self.collide_check == False:
+            self.min_distance = 2000
             if self.collide(self.get_attack_bb(), mc.get_bb()) == True:
                 self.collide_check = True
                 self.target_name = 'mc'
-                return
+                self.min_distance = self.x - mc.x
             for target in targetList:
                 if target.state != target.DIE:
                     if self.collide(self.get_attack_bb(), target.get_hit_bb()) == True:
-                        # if target.state != target.DIE:
-                        self.target_name = target.name
-                        self.target_index = targetList.index(target)
+                        if self.min_distance > self.x - target.x:
+                            self.min_distance = self.x - target.x
+                            self.target_name = target.name
+                            self.target_index = targetList.index(target)
                         self.collide_check = True
-                        return
+
+
 
     def set_background(self, bg):
         self.bg = bg

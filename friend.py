@@ -39,13 +39,11 @@ class Friend:
         self.effect_frame, self.effect_total_frame, self.target_effect_frame, self.effect_pos = 0, 0, 0, 0
         self.effect_left, self.effect_right, self.effect_width, self.effect_height = 0, 0, 0, 0
         self.effect_image = None
-
         self.attack_sound = get_unit_sound(name, 'attack')
         self.attack_sound_check = False
         self.hit_sound = get_unit_sound(name, 'hit')
         self.die_sound = get_unit_sound(name, 'die')
         self.die_sound_check = False
-
         self.font = get_font(20)
 
     def update(self, frame_time, targetList):
@@ -224,14 +222,17 @@ class Friend:
 
     def collide_check_func(self, targetList):
         if self.collide_check == False:
+            self.min_distance = 2000
             for target in targetList:
                 if target.state != target.DIE:
                     if self.collide(self.get_attack_bb(), target.get_hit_bb()) == True:
-                        # if target.state != target.DIE:
-                        self.target_name = target.name
-                        self.target_index = targetList.index(target)
+                        if self.min_distance > target.x - self.x:
+                            self.min_distance = target.x - self.x
+                            self.target_name = target.name
+                            self.target_index = targetList.index(target)
                         self.collide_check = True
-                        return
+
+
 
     def set_background(self, bg):
         self.bg = bg
