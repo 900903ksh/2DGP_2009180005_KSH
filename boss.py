@@ -1,10 +1,5 @@
 from pico2d import *
 from etc import *
-import time
-
-image_data_file = open('data/image_data.txt', 'r') #################
-image_data = json.load(image_data_file)
-image_data_file.close()
 
 boss_data_file = open('data/boss_data.txt', 'r')
 boss_data = json.load(boss_data_file)
@@ -20,25 +15,19 @@ class Boss:
     SKILL1, SKILL2 = 4,5
 
     def __init__(self):
-        # self.stand_image = get_image('Boss_Stand')
-        # self.right_stand_image = get_image('Boss_Right_Hand_Stand')
-        # self.right_die_image = get_image('Boss_Right_Hand_Die')
-        # self.left_stand_image = get_image('Boss_Left_Hand_Stand')
-        # self.left_die_image = get_image('Boss_Left_Hand_Die')
-        # self.skill1_image = get_image('Boss_Skill1')
-        # self.skill2_image = get_image('Boss_Skill2')
-        self.stand_image = load_image(image_data['Boss_Stand'])
-        self.right_stand_image = load_image(image_data['Boss_Right_Hand_Stand'])
-        self.right_die_image = load_image(image_data['Boss_Right_Hand_Die'])
-        self.left_stand_image = load_image(image_data['Boss_Left_Hand_Stand'])
-        self.left_die_image = load_image(image_data['Boss_Left_Hand_Die'])
-        self.skill1_image = load_image(image_data['Boss_Skill1'])
-        self.skill2_image = load_image(image_data['Boss_Skill2'])
+        self.stand_image = get_image('Boss_Stand')
+        self.right_stand_image = get_image('Boss_Right_Hand_Stand')
+        self.right_die_image = get_image('Boss_Right_Hand_Die')
+        self.left_stand_image = get_image('Boss_Left_Hand_Stand')
+        self.left_die_image = get_image('Boss_Left_Hand_Die')
+        self.skill1_image = get_image('Boss_Skill1')
+        self.skill2_image = get_image('Boss_Skill2')
         self.state = self.NORMAL
         self.body_state = 'BODY_STAND'
         self.lhand_state = 'LHAND_STAND'
         self.rhand_state = 'RHAND_STAND'
-        self.hp = 2000
+        self.hp = boss_data['hp']
+        self.max_hp = boss_data['hp']
         self.body_xframe, self.body_yframe, self.body_total_frame = 0, 0, 0
         self.Rhand_xframe, self.Rhand_yframe, self.Rhand_total_frame = 0, 2, 0
         self.Lhand_xframe, self.Lhand_yframe, self.Lhand_total_frame = 0, 2, 0
@@ -98,6 +87,7 @@ class Boss:
         self.Rhand_total_frame += Boss.FRAMES_PER_ACTION * Boss.ACTION_PER_TIME * frame_time
         self.Rhand_xframe = int(self.Rhand_total_frame)% boss_data[self.rhand_state]['xframe']
         if self.state != self.NORMAL and self.state != self.INJURY:
+            self.rhand_state = 'RHAND_DIE'
             if self.Rhand_total_frame >= boss_data[self.rhand_state]['xframe'] and self.Rhand_yframe == 2:
                 self.Rhand_yframe -= 1
                 self.Rhand_total_frame = 0
@@ -122,6 +112,7 @@ class Boss:
         self.Lhand_total_frame += Boss.FRAMES_PER_ACTION * Boss.ACTION_PER_TIME * frame_time
         self.Lhand_xframe = int(self.Lhand_total_frame)% boss_data[self.lhand_state]['xframe']
         if self.state != self.NORMAL:
+            self.lhand_state = 'LHAND_DIE'
             if self.Lhand_total_frame >= boss_data[self.lhand_state]['xframe'] and self.Lhand_yframe == 2:
                 self.Lhand_yframe -= 1
                 self.Lhand_total_frame = 0
@@ -154,53 +145,12 @@ class Boss:
         return boss_data['upper_body_bb']['l'], boss_data['upper_body_bb']['b'],\
                 boss_data['upper_body_bb']['r'], boss_data['upper_body_bb']['h']
 
-
-    def handle_events(self):
-        global running
-        events = get_events()
-        for event in events:
-            if event.type == SDL_QUIT:
-                running = False
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
-                running = False
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_a):
-                self.Lhand_total_frame = 0
-                self.Rhand_total_frame = 0
-                self.state += 1
-                if self.state == 1:
-                    self.lhand_state = 'LHAND_DIE'
-                if self.state == 2:
-                    self.rhand_state = 'RHAND_DIE'
-
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_s):
-                self.state -= 1
-            elif(event.type, event.key) == (SDL_KEYDOWN, SDLK_z):
-                self.body_yframe = 2
-                self.body_state = 'SKILL1'
-            elif(event.type, event.key) == (SDL_KEYDOWN, SDLK_x):
-                self.body_yframe = 2
-                self.body_state = 'SKILL2'
-
-
-def test():
-    open_canvas(1200,600)
-    boss = Boss()
-    current_time = time.time()
-
-    global running
-    running = True
-    while running:
-        boss.handle_events()
-        frame_time = time.time()-current_time
-        current_time += frame_time
-        boss.update(frame_time)
-        clear_canvas()
-        boss.draw()
-        update_canvas()
-        print(boss.state)
-        delay(0.02)
-
-    close_canvas()
-
-if __name__ == "__main__":
-    test()
+    def hit(self, damage):
+        self.hp -= damage
+        print(self.hp)
+        if self.hp < self.max_hp*0.7 and self.hp >= self.max_hp*0.3:
+            self.state = self.INJURY
+        if self.hp < self.max_hp*0.3 and self.hp > 0:
+            self.state = self.FATAL
+        if self.hp <= 0:
+            self.state = self.DIE
