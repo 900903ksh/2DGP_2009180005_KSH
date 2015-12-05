@@ -1,5 +1,5 @@
 from pico2d import *
-import image
+from etc import *
 import skill
 import friend
 
@@ -15,14 +15,8 @@ skill_data_file = open('data/skill_data.txt', 'r')
 skill_data = json.load(skill_data_file)
 skill_data_file.close()
 
-stage_data_file = open('data/stage_data.txt', 'r')
-stage_data = json.load(stage_data_file)
-stage_data_file.close()
-
 
 class MainCharacter:
-    image = None
-
     TIME_PER_ACTION = 0.5
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
@@ -40,12 +34,11 @@ class MainCharacter:
     def __init__(self):
         self.state = self.STAND_RIGHT
         self.hp = mc_data['hp']
+        self.max_hp = mc_data['max_hp']
         self.damage = mc_data['damage']
         self.spirit_amount = mc_data['spirit_amount']
-        for i in image.imageList:
-            if i.name == 'Eregos':
-                self.image = i.image
-        self.x, self.y = mc_data['xpos'], stage_data['stage1']['bottom'] + mc_data['pivotY']
+        self.image = get_image('Eregos')
+        self.x, self.y = mc_data['xpos'], stage_bottom() + mc_data['pivotY']
         self.frame, self.total_frame = 0, 0
         self.state_frame = mc_data[self.state]['frame']
         self.past_state = None
@@ -65,29 +58,37 @@ class MainCharacter:
         self.effect_image = None
 
         self.hit_check = False
+        self.die_check = False
+        self.attack_sound = get_sound('mc_attack')
+        self.skill1_sound = get_sound('mc_skill1')
+        self.skill2_sound = get_sound('mc_skill2')
+        self.heal_sound = get_sound('mc_heal')
+        self.summon_sound = get_sound('mc_summon')
+        self.hit_sound = get_sound('mc_hit')
+        self.die_sound = get_sound('mc_die')
+        self.die_sound.set_volume(128)
+        self.get_spirit_sound = get_sound('mc_get_spirit')
 
-    def set_background(self, bg):  ###
-        self.bg = bg               ###
+    def set_background(self, bg):
+        self.bg = bg
 
-    def update(self, frame_time, friendList, skillList):
+    def update(self, frame_time, friendList, enemyList, skillList):
         self.change_state()
         self.total_frame += MainCharacter.FRAMES_PER_ACTION * MainCharacter.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % self.state_frame
         self.state_frame = mc_data[self.state]['frame']
-        self.handle_state[self.state](self, frame_time, friendList, skillList)
+        self.handle_state[self.state](self, frame_time, friendList, enemyList, skillList)
         if self.spirit_amount < 0: self.spirit_amount = 0
         self.reattack_time += frame_time
         self.game_time += frame_time
+        self.spirit_amount += frame_time
 
         if self.effect_on == True:
             self.effect_total_frame += MainCharacter.FRAMES_PER_ACTION * MainCharacter.ACTION_PER_TIME * frame_time
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
 
     def draw(self):
-        sx = self.x - self.bg.window_left ###
-        # self.image.clip_draw(self.frame * mc_data[self.state]['left'], mc_data[self.state]['bottom'],
-        #                      mc_data[self.state]['width'], mc_data[self.state]['height'],
-        #                      self.x + mc_data[self.state]['plusX'], self.y + mc_data[self.state]['plusY'])
+        sx = self.x - self.bg.window_left
         self.image.clip_draw(self.frame * mc_data[self.state]['left'], mc_data[self.state]['bottom'],
                              mc_data[self.state]['width'], mc_data[self.state]['height'],
                              sx + mc_data[self.state]['plusX'], self.y + mc_data[self.state]['plusY'])
@@ -95,8 +96,7 @@ class MainCharacter:
         if self.effect_on == True:
             if self.effect_image != None:
                 self.effect_image.clip_draw(self.effect_frame * self.effect_left, self.effect_right, self.effect_width,
-                                            self.effect_height, self.x - self.bg.window_left, stage_data['stage1']['bottom'] + self.effect_pos)
-                                            ###- self.bg.window_left
+                                            self.effect_height, self.x - self.bg.window_left, stage_bottom() + self.effect_pos)
                 if self.effect_total_frame >= self.target_effect_frame:
                     self.effect_frame = 0
                     self.effect_total_frame = 0
@@ -133,34 +133,42 @@ class MainCharacter:
                 if self.spirit_amount >= friend_data[self.summon_name]['need_spirit']:
                     self.spirit_amount -= friend_data[self.summon_name]['need_spirit']
                     self.summon_check = True
+                    self.summon_sound.play()
                     self.state = self.SUMMON
                     self.key_lock_func()
 
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
                 if self.reattack_time > mc_data['reattack_time']:
                     self.skill_check = True
                     self.state = self.ATTACK
+                    self.attack_sound.play()
                     self.key_lock_func()
                     self.reattack_time = 0
 
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_q):
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
                 if self.spirit_amount >= skill_data['skill1']['need_spirit']:
                     self.spirit_amount -= skill_data['skill1']['need_spirit']
                     self.skill_check = True
+                    self.skill1_sound.set_volume(90)
+                    self.skill1_sound.play()
                     self.state = self.SKILL1
                     self.key_lock_func()
 
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
                 if self.spirit_amount >= skill_data['skill2']['need_spirit']:
                     self.spirit_amount -= skill_data['skill2']['need_spirit']
                     self.skill_check = True
+                    self.skill1_sound.set_volume(90)
+                    self.skill2_sound.play()
                     self.state = self.SKILL2
                     self.key_lock_func()
 
-            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
+            elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_r):
                 if self.spirit_amount >= skill_data['heal']['need_spirit']:
                     self.spirit_amount -= skill_data['heal']['need_spirit']
                     self.skill_check = True
+                    self.skill1_sound.set_volume(90)
+                    self.heal_sound.play()
                     self.state = self.HEAL
                     self.key_lock_func()
 
@@ -174,64 +182,68 @@ class MainCharacter:
             elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
                 self.left_key_pressed = False
 
-    def handle_stand_right(self, frame_time, friendList, skillList):
+    def handle_stand_right(self, frame_time, friendList, enemyList, skillList):
         if self.hit_check == True:
             self.state = self.HIT_RIGHT
         pass
 
-    def handle_stand_left(self, frame_time, friendList, skillList):
+    def handle_stand_left(self, frame_time, friendList, enemyList, skillList):
         if self.hit_check == True:
             self.state = self.HIT_LEFT
         pass
 
-    def handle_move_right(self, frame_time, friendList, skillList):
+    def handle_move_right(self, frame_time, friendList, enemyList, skillList):
+        for emy in enemyList:
+            if self.collide(self.get_bb(), emy.get_hit_bb()) == True:
+                self.state = self.STAND_RIGHT
+
         self.x += self.RUN_SPEED_PPS * frame_time
         self.x = clamp(0, self.x, self.bg.w) ###
         if self.hit_check == True:
             self.state = self.HIT_RIGHT
 
-    def handle_move_left(self, frame_time, friendList, skillList):
+    def handle_move_left(self, frame_time, friendList, enemyList, skillList):
         self.x -= self.RUN_SPEED_PPS * frame_time
-        self.x = clamp(0, self.x, self.bg.w) ###
+        self.x = clamp(0, self.x, self.bg.w)
         if self.hit_check == True:
             self.state = self.HIT_LEFT
 
-    def handle_skill1(self, frame_time, friendList, skillList):
+    def handle_skill1(self, frame_time, friendList, enemyList, skillList):
         if self.skill_check == True:
-            Skill = skill.Skill1(self.x, stage_data['stage1']['bottom'])
+            Skill = skill.Skill1(self.x, stage_bottom())
             skillList.append(Skill)
             self.skill_check = False
         if self.total_frame > self.state_frame:
             self.next_state()
 
-    def handle_skill2(self, frame_time, friendList, skillList):
+    def handle_skill2(self, frame_time, friendList, enemyList, skillList):
         if self.skill_check == True:
-            Skill = skill.Skill2(self.x, stage_data['stage1']['bottom'])
+            Skill = skill.Skill2(self.x, stage_bottom())
             skillList.append(Skill)
             self.skill_check = False
         if self.total_frame > self.state_frame:
             self.next_state()
 
-    def handle_heal(self, frame_time, friendList, skillList):
+    def handle_heal(self, frame_time, friendList, enemyList, skillList):
         if self.skill_check == True:
             Skill = skill.Heal(self.x, self.y)
             skillList.append(Skill)
             self.hp += Skill.heal_amount
-            if self.hp > mc_data['hp']:
-                self.hp = mc_data['hp']
+            if self.hp > self.max_hp:
+                self.hp = self.max_hp
             self.skill_check = False
         if self.total_frame > self.state_frame:
             self.next_state()
 
-    def handle_attack(self, frame_time, friendList, skillList):
+    def handle_attack(self, frame_time, friendList, enemyList, skillList):
         if self.skill_check == True:
-            Skill = skill.Attack(self.x, stage_data['stage1']['bottom'])
+            Skill = skill.Attack(self.x, stage_bottom())
             skillList.append(Skill)
             self.skill_check = False
         if self.total_frame > self.state_frame:
             self.next_state()
 
-    def handle_summon(self, frame_time, friendList, skillList):
+    def handle_summon(self, frame_time, friendList, enemyList, skillList):
         if self.summon_check == True:
             Friend = friend.Friend(self.summon_name, self.x + mc_data['summon_pos'])
             friendList.append(Friend)
@@ -239,27 +251,30 @@ class MainCharacter:
         if self.total_frame > self.state_frame:
             self.next_state()
 
-    def handle_hit_right(self, frame_time, friendList, skillList):
+    def handle_hit_right(self, frame_time, friendList, enemyList, skillList):
         self.key_lock_func()
         self.x -= frame_time * 30
         if self.game_time > 0.3:
             self.hit_check = False
             self.next_state()
 
-    def handle_hit_left(self, frame_time, friendList, skillList):
+    def handle_hit_left(self, frame_time, friendList, enemyList, skillList):
         self.key_lock_func()
         self.x -= frame_time * 30
         if self.game_time > 0.3:
             self.hit_check = False
             self.next_state()
 
-    def handle_die_right(self, frame_time, friendList, skillList):
+    def handle_die_right(self, frame_time, friendList, enemyList, skillList):
+        if self.total_frame > self.state_frame:
+            self.die_check = True
         pass
 
-    def handle_die_left(self, frame_time, friendList, skillList):
+    def handle_die_left(self, frame_time, friendList, enemyList, skillList):
         pass
 
     def absorb_spirit(self):
+        self.get_spirit_sound.play()
         self.spirit_amount += 10
 
     handle_state = {
@@ -311,10 +326,36 @@ class MainCharacter:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height,\
         self.target_effect_frame, self.effect_pos, self.effect_image = effect
         self.hp -= damage
-        print(self.hp)
+        if self.hp >= 0:
+            self.hit_sound.play()
         if self.hp <= 0:
+            self.key_lock_func()
+            self.hp = 0
+            self.die_sound.play()
             self.state = self.DIE_RIGHT
         else:
             self.hit_check = True
+
+    def skill_hit(self, damage):
+        self.hp -= damage
+        if self.hp >= 0:
+            self.hit_sound.play()
+        self.state = self.HIT_RIGHT
+        if self.hp <= 0:
+            self.key_lock_func()
+            self.hp = 0
+            self.die_sound.play()
+            self.state = self.DIE_RIGHT
+
+    def collide(self, self_bb, target_bb):
+        left_self, bottom_self, right_self, top_self = self_bb
+        left_target, bottom_target, right_target, top_target = target_bb
+
+        if left_self > right_target : return False
+        if right_self < left_target : return False
+        if top_self < bottom_target : return False
+        if bottom_self > top_target : return False
+
+        return True
 
 

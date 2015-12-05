@@ -46,13 +46,13 @@ class Friend:
         self.die_sound_check = False
         self.font = get_font(20)
 
-    def update(self, frame_time, targetList):
+    def update(self, frame_time, targetList, boss):
         self.change_state()
-        self.collide_check_func(targetList)
+        self.collide_check_func(targetList, boss)
         self.game_time += frame_time
         self.total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
         self.frame = int(self.total_frame) % self.state_frame
-        self.handle_state[self.state](self, frame_time, targetList)
+        self.handle_state[self.state](self, frame_time, targetList, boss)
         if self.effect_on == True:
             self.effect_total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
@@ -75,11 +75,11 @@ class Friend:
 
         self.font.draw(sx, self.y + friend_data[self.name]['hit_bb_height'],"%d"%self.hp,(0,84,255))
 
-    def handle_regen(self, frame_time, targetList):
+    def handle_regen(self, frame_time, targetList, boss):
         if self.total_frame >= self.state_frame:
             self.state = self.STAND
 
-    def handle_stand(self, frame_time, targetList):
+    def handle_stand(self, frame_time, targetList, boss):
         if self.past_state == self.ATTACK:
             if self.game_time > friend_data[self.name]['attack_delay']:
                 if self.collide_check == True:
@@ -100,7 +100,7 @@ class Friend:
             elif self.collide_check == False:
                 self.state = self.MOVE
 
-    def handle_move(self, frame_time, targetList):
+    def handle_move(self, frame_time, targetList, boss):
         if self.hit_check == True:
             self.state = self.HIT
         elif self.collide_check == True:
@@ -110,7 +110,7 @@ class Friend:
             self.x += self.speed() * frame_time
             self.x = clamp(0, self.x, self.bg.w)
 
-    def handle_attack(self, frame_time, targetList):
+    def handle_attack(self, frame_time, targetList, boss):
         if self.attack_sound_check == False:
             self.attack_sound.play()
             self.attack_sound_check = True
@@ -124,15 +124,19 @@ class Friend:
                     if self.target_name == targetList[self.target_index].name:
                         targetList[self.target_index].hit(self.damage, self.get_effect())
                         self.attack_check = False
+            if boss != None:
+                boss.hit(self.damage, self.get_effect())
+                self.attack_check = False
 
-    def handle_die(self, frame_time, targetList):
+
+    def handle_die(self, frame_time, targetList, boss):
         if self.die_sound_check == False:
             self.die_sound.play()
             self.die_sound_check = True
         if self.total_frame >= self.state_frame:
             self.die_check = True
 
-    def handle_hit(self, frame_time, targetList):
+    def handle_hit(self, frame_time, targetList, boss):
         self.x -= frame_time * 30
         if self.game_time > 0.3:
             self.state = self.past_state
@@ -220,7 +224,7 @@ class Friend:
 
         return True
 
-    def collide_check_func(self, targetList):
+    def collide_check_func(self, targetList, boss):
         if self.collide_check == False:
             self.min_distance = 2000
             for target in targetList:
@@ -230,8 +234,11 @@ class Friend:
                             self.min_distance = target.x - self.x
                             self.target_name = target.name
                             self.target_index = targetList.index(target)
+                            self.collide_check = True
+            if boss != None:
+                if boss.state != boss.DIE:
+                    if self.collide(self.get_attack_bb(), boss.return_bb()) == True:
                         self.collide_check = True
-
 
 
     def set_background(self, bg):

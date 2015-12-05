@@ -1,5 +1,4 @@
 from pico2d import *
-import random
 
 skill_data_file = open('data/skill_data.txt', 'r')
 skill_data = json.load(skill_data_file)
@@ -13,7 +12,6 @@ class Attack:
     ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
     FRAMES_PER_ACTION = 6
 
-
     def __init__(self, xpos, ypos):
         if Attack.image == None:
             Attack.image = load_image(skill_data['attack']['image'])
@@ -26,7 +24,7 @@ class Attack:
         self.attack_frame = skill_data['attack']['attack_frame']
         self.attack_check = True
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
     def update(self, frame_time):
@@ -40,7 +38,7 @@ class Attack:
 
         self.image.clip_draw(self.frame * skill_data['attack']['draw']['left'], skill_data['attack']['draw']['bottom'],
                              skill_data['attack']['draw']['width'], skill_data['attack']['draw']['height'],
-                             sx, self.y + skill_data['attack']['draw']['ypos']) ###
+                             sx, self.y + skill_data['attack']['draw']['ypos'])
 
     def get_bb(self):
         return self.x - skill_data['attack']['attack_range_left'],\
@@ -59,14 +57,25 @@ class Attack:
 
         return True
 
-    def collide_check_func(self, friendList, enemyList):
+    def collide_check_func(self, friendList, enemyList, boss):
         if self.attack_check == True:
             if self.total_frame >= self.attack_frame:
                 for emy in enemyList:
                     if self.collide(emy.get_hit_bb()) == True:
                         emy.skill_hit(self.damage)
+                if boss != None:
+                    if self.collide(boss.left_hand_bb()) == True or self.collide(boss.upper_body_bb()) == True or self.collide(boss.lower_body_bb()) == True:
+                        boss.hit(self.damage, self.get_effect())
+
                 self.attack_check = False
 
+    def get_effect(self):
+        return skill_data['attack']['EFFECT']['left'],\
+                skill_data['attack']['EFFECT']['bottom'],\
+                skill_data['attack']['EFFECT']['width'],\
+                skill_data['attack']['EFFECT']['height'],\
+                skill_data['attack']['EFFECT']['frame'],\
+                skill_data['attack']['EFFECT']['pos'], self.image
 
 
 class Skill1:
@@ -91,7 +100,7 @@ class Skill1:
         self.attack_frame = skill_data['skill1']['attack_frame']
         self.attack_check = True
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
     def update(self, frame_time):
@@ -128,7 +137,7 @@ class Skill1:
 
         return True
 
-    def collide_check_func(self, friendList, enemyList):
+    def collide_check_func(self, friendList, enemyList, boss):
         if self.attack_check == True:
             if self.state == self.ATTACK:
                 if self.total_frame >= self.attack_frame:
@@ -179,8 +188,6 @@ class Skill2:
             self.total_frame = 0
             self.skill_frame = skill_data['skill2'][self.state]['frame']
 
-
-
     def draw(self):
         self.image.clip_draw(self.frame * skill_data['skill2'][self.state]['left'], skill_data['skill2'][self.state]['bottom'],
                              skill_data['skill2'][self.state]['width'], skill_data['skill2'][self.state]['height'],
@@ -204,7 +211,7 @@ class Skill2:
 
         return True
 
-    def collide_check_func(self, friendList, enemyList):
+    def collide_check_func(self, friendList, enemyList, boss):
         if self.attack_check == True:
             if self.state == self.ATTACK:
                 if self.total_frame >= self.attack_frame:
@@ -249,5 +256,5 @@ class Heal:
                              self.x - self.bg.window_left, self.y, ###
                              skill_data['heal']['draw']['xsize'], skill_data['heal']['draw']['ysize'])
 
-    def collide_check_func(self, friendList, enemyList):
+    def collide_check_func(self, friendList, enemyList, boss):
         pass
