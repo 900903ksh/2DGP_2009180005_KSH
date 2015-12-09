@@ -126,7 +126,7 @@ def draw_lose():
     ui_image.clip_draw(1224, 932, 205, 76, 600, 300)
 
 
-def draw_main_ui(mc, time):
+def draw_main_ui(mc, boss, time):
     global ui_image, font20, font40
     ui_image.clip_draw(  0, 0, 100, 100, 50,30, 60,60) #unit ui
     font20.draw(25,50,"%d"%friend_data['SkelSoldier']['need_spirit'],(189,189,189))
@@ -143,11 +143,17 @@ def draw_main_ui(mc, time):
 
     ui_image.clip_draw(  0, 200, 100, 100,45,420, 70,70) #skill ui
     ui_image.clip_draw(100, 200, 100, 100,45,330, 70,70)
-    font20.draw(15,365,"%d"%skill_data['skill1']['need_spirit'],(189,189,189))
-    font20.draw(15,305,"%d"%skill_data['skill1']['damage'],(255,0,0))
+    if stage_name() != 'stage3':
+        font20.draw(15,365,"%d"%skill_data['skill1']['need_spirit'],(189,189,189))
+        font20.draw(15,305,"%d"%skill_data['skill1']['damage'],(255,0,0))
+    if stage_name() == 'stage3':
+        ui_image.clip_draw(1285, 0, 200, 200, 45, 330, 70, 70) #block ui
     ui_image.clip_draw(200, 200, 100, 100,45,240, 70,70)
-    font20.draw(15,275,"%d"%skill_data['skill2']['need_spirit'],(189,189,189))
-    font20.draw(15,215,"%d"%skill_data['skill2']['damage'],(255,0,0))
+    if stage_name() != 'stage3':
+        font20.draw(15,275,"%d"%skill_data['skill2']['need_spirit'],(189,189,189))
+        font20.draw(15,215,"%d"%skill_data['skill2']['damage'],(255,0,0))
+    if stage_name() == 'stage3':
+        ui_image.clip_draw(1285, 0, 200, 200, 45, 240, 70, 70) #block ui
     ui_image.clip_draw(300, 200, 100, 100,45,150, 70,70)
     font20.draw(15,185,"%d"%skill_data['heal']['need_spirit'],(189,189,189))
     font20.draw(15,125,"%d"%skill_data['heal']['heal_amount'],(0,84,255))
@@ -159,6 +165,11 @@ def draw_main_ui(mc, time):
 
     ui_image.clip_draw_to_origin(995, 496, 200-int((mc.max_hp - mc.hp)/4),
                                  24,123,550,195-int((mc.max_hp - mc.hp)/4), 21) #hp gauge ui
+
+    if stage_name() == 'stage3':
+        ui_image.clip_draw(1085, 0, 200, 24, 800, 550, 600, 48)
+        ui_image.clip_draw_to_origin(995, 496, 200-int((boss.max_hp - boss.hp)/10),
+                                     24, 505, 530, 590-int((boss.max_hp - boss.hp)/3.3), 42)
 
     font20.draw(130,541, "HP : %d" %mc.hp, (189,189,189))
     font20.draw(153,509, "%d" %mc.spirit_amount, (189,189,189))

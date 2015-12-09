@@ -63,7 +63,7 @@ class Attack:
                 for emy in enemyList:
                     if self.collide(emy.get_hit_bb()) == True:
                         emy.skill_hit(self.damage)
-                if boss != None:
+                if boss != None and boss.state != boss.DIE:
                     if self.collide(boss.left_hand_bb()) == True or self.collide(boss.upper_body_bb()) == True or self.collide(boss.lower_body_bb()) == True:
                         boss.hit(self.damage, self.get_effect())
 

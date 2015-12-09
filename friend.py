@@ -235,10 +235,9 @@ class Friend:
                             self.target_name = target.name
                             self.target_index = targetList.index(target)
                             self.collide_check = True
-            if boss != None:
-                if boss.state != boss.DIE:
-                    if self.collide(self.get_attack_bb(), boss.return_bb()) == True:
-                        self.collide_check = True
+            if boss != None and boss.state != boss.DIE:
+                if self.collide(self.get_attack_bb(), boss.return_bb()) == True:
+                    self.collide_check = True
 
 
     def set_background(self, bg):

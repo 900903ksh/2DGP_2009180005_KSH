@@ -32,7 +32,7 @@ class Boss:
         self.lhand_state = 'LHAND_STAND'
         self.rhand_state = 'RHAND_STAND'
         self.hp = boss_data['hp']
-        self.max_hp = boss_data['hp']
+        self.max_hp = boss_data['max_hp']
         self.body_xframe, self.body_yframe, self.body_total_frame = 0, 0, 0
         self.Rhand_xframe, self.Rhand_yframe, self.Rhand_total_frame = 0, 2, 0
         self.Lhand_xframe, self.Lhand_yframe, self.Lhand_total_frame = 0, 2, 0
@@ -201,13 +201,15 @@ class Boss:
         self.effect_left, self.effect_right, self.effect_width, self.effect_height,\
         self.target_effect_frame, self.effect_pos, self.effect_image = effect
         self.hp -= damage
-        if self.hp < self.max_hp*0.7 and self.hp >= self.max_hp*0.3 and self.state == self.NORMAL:
+        if self.hp < self.max_hp*0.7 and self.hp >= self.max_hp*0.4 and self.state == self.NORMAL:
             self.state = self.INJURY
+            self.for_unit_damage = boss_data['for_unit_damage_in_injury']
             self.lhand_state = 'LHAND_DIE'
             self.lhand_die_sound.play()
             self.Lhand_total_frame = 0
-        elif self.hp < self.max_hp*0.3 and self.hp > 0 and self.state == self.INJURY:
+        elif self.hp < self.max_hp*0.4 and self.hp > 0 and self.state == self.INJURY:
             self.state = self.FATAL
+            self.for_unit_damage = boss_data['for_unit_damage_in_fatal']
             self.rhand_state = 'RHAND_DIE'
             self.rhand_die_sound.play()
             self.Rhand_total_frame = 0
