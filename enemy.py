@@ -238,7 +238,7 @@ class Enemy:
                             self.min_distance = self.x - target.x
                             self.target_name = target.name
                             self.target_index = targetList.index(target)
-                        self.collide_check = True
+                            self.collide_check = True
 
 
 
