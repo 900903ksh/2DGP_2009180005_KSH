@@ -1,7 +1,5 @@
 from pico2d import *
 
-name = "etc"
-
 stage_data_file = open('data/stage_data.txt', 'r')
 stage_data = json.load(stage_data_file)
 stage_data_file.close()
@@ -76,13 +74,13 @@ def get_unit_sound(name, state):
 def win():
     global stage_num
     stage_num += 1
-    get_sound('win').set_volume(120)
+    get_sound('win').set_volume(128)
     get_sound('win').play()
     return True
 
 
 def lose():
-    get_sound('lose').set_volume(120)
+    get_sound('lose').set_volume(128)
     get_sound('lose').play()
     return False
 
@@ -106,6 +104,14 @@ def stage_bottom():
 
 def stage_end():
     return stage_data[stage_dic[stage_num]]['end']
+
+
+def min_emy():
+    return stage_data[stage_dic[stage_num]]['min_emy_num']
+
+
+def max_emy():
+    return stage_data[stage_dic[stage_num]]['max_emy_num']
 
 
 def get_font(size):

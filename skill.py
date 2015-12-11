@@ -112,12 +112,11 @@ class Skill1:
         if self.state == self.DIE:
             return False
 
-
     def draw(self):
         self.image.clip_draw(self.frame * skill_data['skill1']['draw']['left'],
                              self.state * skill_data['skill1']['draw']['bottom'],
                              skill_data['skill1']['draw']['width'], skill_data['skill1']['draw']['height'],
-                             self.x - self.bg.window_left, self.y, ###
+                             self.x - self.bg.window_left, self.y,
                              skill_data['skill1']['draw']['xsize'], skill_data['skill1']['draw']['ysize'])
 
     def get_bb(self):
@@ -172,7 +171,7 @@ class Skill2:
         self.attack_frame = skill_data['skill2']['attack_frame']
         self.attack_check = True
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
     def update(self, frame_time):
@@ -241,7 +240,7 @@ class Heal:
         self.x = xpos
         self.y = ypos + skill_data['heal']['draw']['ypos']
 
-    def set_background(self, bg):  ###
+    def set_background(self, bg):
         self.bg = bg
 
     def update(self, frame_time):
@@ -253,7 +252,7 @@ class Heal:
     def draw(self):
         self.image.clip_draw(self.frame * skill_data['heal']['draw']['left'], skill_data['heal']['draw']['bottom'],
                              skill_data['heal']['draw']['width'], skill_data['heal']['draw']['height'],
-                             self.x - self.bg.window_left, self.y, ###
+                             self.x - self.bg.window_left, self.y,
                              skill_data['heal']['draw']['xsize'], skill_data['heal']['draw']['ysize'])
 
     def collide_check_func(self, friendList, enemyList, boss):

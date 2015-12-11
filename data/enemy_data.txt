@@ -12,7 +12,7 @@
 
 	"Lycanthrope" : {
 		"image": "resource/enemy/Emy2_Lycanthrope.png", "pivotX" : 0, "pivotY" : 84, "attack_delay": 2,
-		"speed": 37, "hp": 180, "damage": 15, "attack_frame": 5, "type": "short_distance",
+		"speed": 44, "hp": 180, "damage": 20, "attack_frame": 5, "type": "short_distance",
 		"hit_bb_left": 60, "hit_bb_bottom": 85, "hit_bb_right": 30, "hit_bb_height": 80, "regen_time": 2,
 		"EFFECT" : { "frame": 5, "left":111, "bottom":  0, "width":111, "height":100, "pos": 55 },
 		"STAND"  : { "frame": 7, "left":149, "bottom":911, "width":149, "height":190, "plusX":-10, "plusY":  0 },
@@ -34,7 +34,7 @@
 
 	"CorruptedCornian" : {
 		"image": "resource/enemy/Emy4_CorruptedCornian.png", "pivotX" : 0, "pivotY" : 84, "attack_delay": 2,
-		"speed": 30, "hp":200, "damage":20, "attack_frame": 4, "type": "short_distance",
+		"speed": 37, "hp":200, "damage":25, "attack_frame": 4, "type": "short_distance",
 		"hit_bb_left": 50, "hit_bb_bottom": 85, "hit_bb_right": 50, "hit_bb_height": 50, "regen_time": 3,
 		"EFFECT" : { "frame": 3, "left":109, "bottom":  0, "width":109, "height":116, "pos": 45 },
 		"STAND"  : { "frame": 6, "left":192, "bottom":923, "width":192, "height":176, "plusX": 0, "plusY": 0 },
@@ -56,7 +56,7 @@
 
 	"JuniorBalrog" : {
 		"image": "resource/enemy/Emy6_JuniorBalrog.png", "pivotX" : 0, "pivotY" : 80, "attack_delay": 2,
-		"speed": 27, "hp": 400, "damage": 40, "attack_frame": 3, "type": "short_distance",
+		"speed": 30, "hp": 400, "damage": 40, "attack_frame": 3, "type": "short_distance",
 		"hit_bb_left": 50, "hit_bb_bottom": 80, "hit_bb_right": 50, "hit_bb_height": 40, "regen_time": 5,
 		"EFFECT" : { "frame":4, "left":110, "bottom":   0, "width":110, "height":120, "pos": 45 },
 		"STAND"  : { "frame":2, "left":170, "bottom":1025, "width":170, "height":180, "plusX": 0, "plusY": 0 },
@@ -67,7 +67,7 @@
 
 	"CrimsonBalrog" : {
 		"image": "resource/enemy/Emy7_CrimsonBalrog.png", "pivotX" : 0, "pivotY" : 160, "attack_delay": 2,
-		"speed": 35, "hp": 350, "damage": 35, "attack_frame": 5, "type": "long_distance", "attack_distance" : 250,
+		"speed": 38, "hp": 350, "damage": 35, "attack_frame": 5, "type": "long_distance", "attack_distance" : 250,
 		"hit_bb_left": 50, "hit_bb_bottom": 150, "hit_bb_right": 50, "hit_bb_height": 0, "regen_time": 5,
 		"EFFECT" : { "frame":9, "left":311, "bottom":   0, "width":311, "height":330, "pos": 70 },
 		"STAND"  : { "frame": 4, "left":322, "bottom":1382, "width":322, "height":330, "plusX": 0, "plusY": 0 },

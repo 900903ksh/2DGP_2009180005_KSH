@@ -1,4 +1,3 @@
-from pico2d import *
 from etc import *
 
 enemy_data_file = open('data/enemy_data.txt', 'r')
@@ -239,8 +238,6 @@ class Enemy:
                             self.target_name = target.name
                             self.target_index = targetList.index(target)
                             self.collide_check = True
-
-
 
     def set_background(self, bg):
         self.bg = bg

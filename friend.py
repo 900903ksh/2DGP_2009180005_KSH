@@ -1,4 +1,3 @@
-from pico2d import *
 from etc import *
 import random
 
@@ -56,7 +55,6 @@ class Friend:
         if self.effect_on == True:
             self.effect_total_frame += Friend.FRAMES_PER_ACTION * Friend.ACTION_PER_TIME * frame_time
             self.effect_frame = int(self.effect_total_frame) % self.target_effect_frame
-
 
     def draw(self):
         sx = self.x - self.bg.window_left
@@ -127,7 +125,6 @@ class Friend:
             if boss != None:
                 boss.hit(self.damage, self.get_effect())
                 self.attack_check = False
-
 
     def handle_die(self, frame_time, targetList, boss):
         if self.die_sound_check == False:
@@ -238,7 +235,6 @@ class Friend:
             if boss != None and boss.state != boss.DIE:
                 if self.collide(self.get_attack_bb(), boss.return_bb()) == True:
                     self.collide_check = True
-
 
     def set_background(self, bg):
         self.bg = bg

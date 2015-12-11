@@ -1,4 +1,3 @@
-from pico2d import *
 from etc import *
 import skill
 import friend
@@ -60,6 +59,7 @@ class MainCharacter:
         self.hit_check = False
         self.die_check = False
         self.attack_sound = get_sound('mc_attack')
+        self.attack_sound.set_volume(50)
         self.skill1_sound = get_sound('mc_skill1')
         self.skill2_sound = get_sound('mc_skill2')
         self.heal_sound = get_sound('mc_heal')
@@ -146,19 +146,19 @@ class MainCharacter:
                     self.reattack_time = 0
 
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_w):
-                if self.spirit_amount >= skill_data['skill1']['need_spirit']:
+                if self.spirit_amount >= skill_data['skill1']['need_spirit'] and \
+                                stage_name() != 'stage3':
                     self.spirit_amount -= skill_data['skill1']['need_spirit']
                     self.skill_check = True
-                    self.skill1_sound.set_volume(90)
                     self.skill1_sound.play()
                     self.state = self.SKILL1
                     self.key_lock_func()
 
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_e):
-                if self.spirit_amount >= skill_data['skill2']['need_spirit']:
+                if self.spirit_amount >= skill_data['skill2']['need_spirit'] and \
+                                stage_name() != 'stage3':
                     self.spirit_amount -= skill_data['skill2']['need_spirit']
                     self.skill_check = True
-                    self.skill1_sound.set_volume(90)
                     self.skill2_sound.play()
                     self.state = self.SKILL2
                     self.key_lock_func()
@@ -167,7 +167,6 @@ class MainCharacter:
                 if self.spirit_amount >= skill_data['heal']['need_spirit']:
                     self.spirit_amount -= skill_data['heal']['need_spirit']
                     self.skill_check = True
-                    self.skill1_sound.set_volume(90)
                     self.heal_sound.play()
                     self.state = self.HEAL
                     self.key_lock_func()
@@ -198,7 +197,7 @@ class MainCharacter:
                 self.state = self.STAND_RIGHT
 
         self.x += self.RUN_SPEED_PPS * frame_time
-        self.x = clamp(0, self.x, self.bg.w) ###
+        self.x = clamp(0, self.x, self.bg.w)
         if self.hit_check == True:
             self.state = self.HIT_RIGHT
 
@@ -266,7 +265,7 @@ class MainCharacter:
             self.next_state()
 
     def handle_die_right(self, frame_time, friendList, enemyList, skillList):
-        if self.total_frame > self.state_frame:
+        if self.total_frame >= self.state_frame:
             self.die_check = True
         pass
 

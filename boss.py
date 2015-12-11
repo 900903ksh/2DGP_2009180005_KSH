@@ -1,4 +1,3 @@
-from pico2d import *
 from etc import *
 
 boss_data_file = open('data/boss_data.txt', 'r')
@@ -96,7 +95,6 @@ class Boss:
                 self.body_yframe = 0
                 self.body_total_frame = 0
                 self.stand_times += 1
-                print(self.stand_times)
 
         elif self.body_state == 'SKILL1' or self.body_state == 'SKILL2':
             self.body_xframe = int(self.body_total_frame) % boss_data[self.body_state]['xframe']
@@ -220,7 +218,7 @@ class Boss:
 
     def skill_change(self):
         global nom1, nom2
-        if self.state == self.NORMAL: nom1, nom2 = 5, 4
+        if self.state == self.NORMAL: nom1, nom2 = 5, 4 ##stand 상태가 지속되는 횟수
         elif self.state == self.INJURY: nom1, nom2 = 3, 2
         elif self.state == self.FATAL: nom1, nom2 = 1, 1
 
