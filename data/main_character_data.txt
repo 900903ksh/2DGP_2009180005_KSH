@@ -1,7 +1,7 @@
 {
 	"image" : "resource/friend/MainCharacter.png", "pivotX" : 0, "pivotY" : 130, "reattack_time": 1,
 	"xpos": 200, "speed" : 50, "hp" : 800, "max_hp" : 800, "damage" : 30, "spirit_amount" : 500, "attack_frame":4,
-	"summon_pos": 10, "bb_left": 70, "bb_bottom": 120, "bb_right": 60, "bb_height": 65,
+	"summon_pos": 10, "bb_left": 70, "bb_bottom": 120, "bb_right": 60, "bb_height": 65, "spirit_increase_rate" : 3,
 	"MOVE_LEFT"   : { "frame": 8, "left": 204, "bottom":3463, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },
 	"MOVE_RIGHT"  : { "frame": 8, "left": 204, "bottom":3760, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },
 	"STAND_LEFT"  : { "frame": 8, "left": 204, "bottom":3463, "width": 204, "height": 287, "plusX":  0, "plusY":  0 },

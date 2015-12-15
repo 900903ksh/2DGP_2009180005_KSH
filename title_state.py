@@ -1,8 +1,6 @@
 import game_framework
-import main_state
-import start_state
-import image
-from pico2d import *
+import guide_state
+from etc import *
 
 name = "TitleState"
 
@@ -15,25 +13,20 @@ x, y = 0, 0
 frame_x ,frame_y, total_frame = 0, 0, 0
 
 def enter():
-    global bg_image, sprite_image, ui_image
+    global bg_image, sprite_image, ui_image, mouse_click, mouse_over
+    etc_init()
     bg_image = load_image('resource/title_bg.png')
     sprite_image = load_image('resource/title_sprite.png')
-    for i in image.imageList:
-        if i.name == 'UI':
-            ui_image = i.image
+    ui_image = get_image('UI')
+
+    get_sound('bgm_title').repeat_play()
+    mouse_click = False
+    mouse_over = False
 
 
 def exit():
     global bg_image, sprite_image, frame_x, frame_y, total_frame, ui_image, button_down, x, y
-    del(bg_image)
-    del(sprite_image)
-    del(frame_x)
-    del(frame_y)
-    del(total_frame)
-    del(ui_image)
-    del(x)
-    del(y)
-    del(button_down)
+    del(bg_image, sprite_image, frame_x, frame_y, total_frame, ui_image, x, y, button_down)
 
 
 def update(frame_time):
@@ -56,23 +49,32 @@ def update(frame_time):
 
 
 def draw(frame_time):
-    global bg_image, sprite_image, frame_x, frame_y, ui_image, button_down, x, y
+    global bg_image, sprite_image, frame_x, frame_y, ui_image, button_down, x, y, mouse_over, mouse_click
 
     clear_canvas()
 
     bg_image.draw(600,300)
+
     sprite_image.clip_draw(734*frame_x,422*frame_y, 734, 422, 580,300)
-    ui_image.clip_draw(50,732,675,111,600,500)
+    ui_image.clip_draw(50, 732, 675, 111, 600, 500) ### 제목
 
     if collide() == True:
         if button_down == True:
-            ui_image.clip_draw(582,566,438,98,600,60)
+            ui_image.clip_draw(582, 566, 438, 98, 600, 60) ### 게임스타트 버튼을 누른 상태를 그림
+            if mouse_click == False:
+                get_sound('mouse_click').play(1)
+                mouse_click = True
         else:
-            ui_image.clip_draw(582,566,438,98,600,65)
+            ui_image.clip_draw(582, 566, 438, 98, 600, 65) ### 게임스타트 버튼에 마우스를 올린 상태를 그림
+            if mouse_over == False:
+                get_sound('mouse_over').play(1)
+                mouse_over = True
     elif collide() != True and button_down != True:
-        ui_image.clip_draw(47,571,438,98,600,63)
+        ui_image.clip_draw(47, 571, 438, 98, 600, 63) ### 게임스타트 버튼 일반 상태를 그림
+        mouse_click = False
+        mouse_over = False
     elif collide() == False and button_down == True:
-        ui_image.clip_draw(582,566,438,98,600,60)
+        ui_image.clip_draw(582, 566, 438, 98, 600, 60) ### 게임스타트 버튼을 누른 체로 마우스를 움직이는 상태를 그림
 
     update_canvas()
 
@@ -91,7 +93,7 @@ def handle_events(frame_time):
         elif event.type == SDL_MOUSEBUTTONUP:
             button_down = False
             if collide() == True:
-                game_framework.change_state(start_state)
+                game_framework.change_state(guide_state)
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
             game_framework.quit()
 
@@ -102,9 +104,6 @@ def collide():
         return True
     else:
         return False
-
-
-
 
 
 def pause(): pass

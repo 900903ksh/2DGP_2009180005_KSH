@@ -1,6 +1,5 @@
 import game_framework
 import start_state
-from pico2d import *
 from etc import *
 
 name = "GuideState"
@@ -17,6 +16,7 @@ def exit():
     global bg_image
     del(bg_image)
     get_sound('bgm_title').stop()
+
 
 def update(frame_time):
     pass

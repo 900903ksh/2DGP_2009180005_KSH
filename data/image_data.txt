@@ -1,13 +1,21 @@
 {
 	"Eregos" : "resource/friend/MainCharacter.png",
 
+	"Boss_Stand" : "resource/enemy/Boss/Boss_Stand.png",
+	"Boss_Die" : "resource/enemy/Boss/Boss_Die.png",
+	"Boss_Right_Hand_Stand" : "resource/enemy/Boss/Boss_Right_Hand_Stand.png",
+	"Boss_Right_Hand_Die" : "resource/enemy/Boss/Boss_Right_Hand_Die.png",
+	"Boss_Left_Hand_Stand" : "resource/enemy/Boss/Boss_Left_Hand_Stand.png",
+	"Boss_Left_Hand_Die" : "resource/enemy/Boss/Boss_Left_Hand_Die.png",
+	"Boss_Skill1" : "resource/enemy/Boss/Boss_Skill1.png",
+	"Boss_Skill2" : "resource/enemy/Boss/Boss_Skill2.png",
+
 	"SkelSoldier" : "resource/friend/Fnd1_SkelSoldier.png",
 	"SkelOfficer" : "resource/friend/Fnd2_SkelOfficer.png",
 	"SkelCommander" : "resource/friend/Fnd3_SkelCommander.png",
 	"SkelSpearknight" : "resource/friend/Fnd4_SkelSpearknight.png",
 	"Wraith" : "resource/friend/Fnd5_Wraith.png",
 	"MuscleStone" : "resource/friend/Fnd6_MuscleStone.png",
-
 
 	"Bulldog" : "resource/enemy/Emy1_Bulldog.png",
 	"Lycanthrope" : "resource/enemy/Emy2_Lycanthrope.png",
@@ -16,5 +24,13 @@
 	"DemonGargoyle" : "resource/enemy/Emy5_DemonGargoyle.png",
 	"JuniorBalrog" : "resource/enemy/Emy6_JuniorBalrog.png",
 	"CrimsonBalrog" : "resource/enemy/Emy7_CrimsonBalrog.png",
-	"BabyBalrog" : "resource/enemy/EmyBonus_BabyBalrog.png"
+	"BabyBalrog" : "resource/enemy/EmyBonus_BabyBalrog.png",
+
+	"ending_side" : "resource/ending/ending_side.png",
+	"ebg1" : "resource/ending/ebg1.png",
+	"ebg2" : "resource/ending/ebg2.png",
+	"ebg3" : "resource/ending/ebg3.png",
+	"ebg4" : "resource/ending/ebg4.png",
+
+	"UI" : "resource/ui.png"
 }

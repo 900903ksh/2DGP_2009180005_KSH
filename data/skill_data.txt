@@ -1,22 +1,23 @@
 {
 	"attack" : {
-		"image": "resource/skill/attack_opacify2.png", "damage": 10, "attack_frame": 6, "limit_frame": 14,
+		"EFFECT" : { "frame": 1, "left":0, "bottom":  0, "width":0, "height":0, "pos":0 },
+		"image": "resource/skill/attack_opacify2.png", "damage": 10, "attack_frame": 6, "limit_frame": 14, "cooltime" : 2,
 		"attack_range_left": 70, "attack_range_bottom": 70, "attack_range_right": 130, "attack_range_height": 120,
 		"draw": { "frame": 14, "left": 249, "bottom": 0, "width": 249, "height": 244, "xpos": 300, "ypos": 30, "xsize": 0, "ysize": 0 } },
 
 	"skill1" : {
-		"image": "resource/skill/skill1_opacify.png", "attack_frame": 1, "need_spirit": 100,
+		"image": "resource/skill/skill1_opacify.png", "attack_frame": 1, "need_spirit": 100, "cooltime" : 20,
 		"damage": 200, "attack_range_left": 60, "attack_range_bottom": 500, "attack_range_right": 300, "attack_range_height": 500,
 		"draw": { "frame": 12, "left": 404, "bottom": 326, "width": 404, "height": 326, "xpos": 450, "ypos": 335, "xsize": 800, "ysize": 800  } },
 
 	"skill2" : {
-		"image": "resource/skill/skill2_opacify.png", "attack_frame": 8, "need_spirit": 150,
+		"image": "resource/skill/skill2_opacify.png", "attack_frame": 8, "need_spirit": 150, "cooltime" : 30,
 		"damage": 300, "attack_range_left": 185, "attack_range_bottom": 500, "attack_range_right": 185, "attack_range_height": 500,
 		"SUMMON": { "frame": 18, "left": 334, "bottom":   0, "width": 334, "height": 375, "xpos": 450, "ypos": 351, "xsize": 700, "ysize": 800 },
 		"ATTACK": { "frame": 15, "left": 334, "bottom": 389, "width": 334, "height": 356, "xpos": 450, "ypos": 325, "xsize": 700, "ysize": 769 },
 		"DIE"   : { "frame":  9, "left": 334, "bottom": 770, "width": 334, "height": 171, "xpos": 450, "ypos": 467, "xsize": 700, "ysize": 369 } },
 
 	"heal" : {
-		"image": "resource/skill/heal.png", "heal_amount": 100, "need_spirit" : 50, "limit_frame": 12,
+		"image": "resource/skill/heal.png", "heal_amount": 100, "need_spirit" : 50, "limit_frame": 12,  "cooltime" : 5,
 		"draw": { "frame": 6, "left": 93, "bottom": 0, "width": 93, "height": 140, "xpos": 0, "ypos": 70, "xsize": 150, "ysize": 235 } }
 }

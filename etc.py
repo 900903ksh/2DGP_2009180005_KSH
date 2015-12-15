@@ -117,6 +117,9 @@ def max_emy():
 def get_font(size):
     return load_font('resource/font/malgunbd.ttf',size)
 
+def get_MN_font(size):
+    return load_font('resource/font/MN.ttf',size)
+
 
 def draw_stage_title():
     if stage_num == 1 : ui_image.clip_draw( 33, 443, 195, 122,600,300)
@@ -174,8 +177,8 @@ def draw_main_ui(mc, boss, time):
 
     if stage_name() == 'stage3':
         ui_image.clip_draw(1085, 0, 200, 24, 800, 550, 600, 48)
-        ui_image.clip_draw_to_origin(995, 496, 200-int((boss.max_hp - boss.hp)/10),
-                                     24, 505, 530, 590-int((boss.max_hp - boss.hp)/3.3), 42)
+        ui_image.clip_draw_to_origin(995, 496, 200-int((boss.max_hp - boss.hp)/5),
+                                     24, 505, 530, 590-int((boss.max_hp - boss.hp)/1.7), 42)
 
     font20.draw(130,541, "HP : %d" %mc.hp, (189,189,189))
     font20.draw(153,509, "%d" %mc.spirit_amount, (189,189,189))
@@ -216,12 +219,20 @@ def etc_init():
     imageList.append(Image('CrimsonBalrog'))
     imageList.append(Image('BabyBalrog'))
 
+    imageList.append(Image('ending_side'))
+    imageList.append(Image('ebg1'))
+    imageList.append(Image('ebg2'))
+    imageList.append(Image('ebg3'))
+    imageList.append(Image('ebg4'))
+
+
     imageList.append(Image('UI'))
 
     soundList.append(Bgm('bgm_title'))
     soundList.append(Bgm('stage1'))
     soundList.append(Bgm('stage2'))
     soundList.append(Bgm('stage3'))
+    soundList.append(Bgm('bgm_ending'))
     soundList.append(Bgm('win'))
     soundList.append(Bgm('lose'))
     soundList.append(Sound('mouse_over'))

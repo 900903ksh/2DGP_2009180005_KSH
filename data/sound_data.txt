@@ -1,0 +1,43 @@
+{
+	"bgm_title" : "resource/sound/bgm_title.mp3",
+	"stage1" : "resource/sound/bgm_stage1.mp3",
+	"stage2" : "resource/sound/bgm_stage2.mp3",
+	"stage3" : "resource/sound/bgm_stage3(boss).mp3",
+	"bgm_ending" : "resource/sound/bgm_ending.mp3",
+
+	"win" : "resource/sound/win.mp3",
+	"lose" : "resource/sound/lose.mp3",
+
+	"mouse_click" : "resource/sound/mouse_click.wav",
+	"mouse_over" : "resource/sound/mouse_over.wav",
+
+	"mc_attack" : "resource/sound/friend/main_attack.wav",
+	"mc_skill1" : "resource/sound/friend/main_skill1.wav",
+	"mc_skill2" : "resource/sound/friend/main_skill2.wav",
+	"mc_heal" : "resource/sound/friend/main_heal.wav",
+	"mc_summon" : "resource/sound/friend/main_summon.wav",
+	"mc_hit" : "resource/sound/friend/main_hit.wav",
+	"mc_die" : "resource/sound/friend/main_die.wav",
+	"mc_get_spirit" : "resource/sound/friend/get_spirit.wav",
+
+	"boss_skill1" : "resource/sound/enemy/Boss_Skill1.wav",
+	"boss_skill2" : "resource/sound/enemy/Boss_Skill2.wav",
+	"boss_lhd_die" : "resource/sound/enemy/Boss_Left_Hand_Die.wav",
+	"boss_rhd_die" : "resource/sound/enemy/Boss_Right_Hand_die.wav",
+	"boss_die" : "resource/sound/enemy/Boss_Die.wav",
+
+	"SkelSoldier" : { "attack" : "resource/sound/friend/unit1_attack.wav", "hit" : "resource/sound/friend/unit1_hit.wav", "die" : "resource/sound/friend/unit1_die.wav" },
+	"SkelOfficer" : { "attack" : "resource/sound/friend/unit2_attack.wav", "hit" : "resource/sound/friend/unit2_hit.wav", "die" : "resource/sound/friend/unit2_die.wav" },
+	"SkelCommander" : { "attack" : "resource/sound/friend/unit3_attack.wav", "hit" : "resource/sound/friend/unit3_hit.wav", "die" : "resource/sound/friend/unit3_die.wav" },
+	"SkelSpearknight" : { "attack" : "resource/sound/friend/unit4_attack.wav", "hit" : "resource/sound/friend/unit4_hit.wav", "die" : "resource/sound/friend/unit4_die.wav" },
+	"Wraith" : { "attack" : "resource/sound/friend/unit5_attack.wav", "hit" : "resource/sound/friend/unit5_hit.wav", "die" : "resource/sound/friend/unit5_die.wav" },
+	"MuscleStone" : { "attack" : "resource/sound/friend/unit6_attack.wav", "hit" : "resource/sound/friend/unit6_hit.wav", "die" : "resource/sound/friend/unit6_die.wav" },
+
+	"Bulldog" : { "attack" : "resource/sound/enemy/enemy1_attack.wav", "hit" : "resource/sound/enemy/enemy1_hit.wav", "die" : "resource/sound/enemy/enemy1_die.wav" },
+	"Lycanthrope" : { "attack" : "resource/sound/enemy/enemy2_attack.wav", "hit" : "resource/sound/enemy/enemy2_hit.wav", "die" : "resource/sound/enemy/enemy2_die.wav" },
+	"CorruptedWyvern" : { "attack" : "resource/sound/enemy/enemy3_attack.wav", "hit" : "resource/sound/enemy/enemy3_hit.wav", "die" : "resource/sound/enemy/enemy3_die.wav" },
+	"CorruptedCornian" : { "attack" : "resource/sound/enemy/enemy4_attack.wav", "hit" : "resource/sound/enemy/enemy4_hit.wav", "die" : "resource/sound/enemy/enemy4_die.wav" },
+	"DemonGargoyle" : { "attack" : "resource/sound/enemy/enemy5_attack.wav", "hit" : "resource/sound/enemy/enemy5_hit.wav", "die" : "resource/sound/enemy/enemy5_die.wav" },
+	"JuniorBalrog" : { "attack" : "resource/sound/enemy/enemy6_attack.wav", "hit" : "resource/sound/enemy/enemy6_hit.wav", "die" : "resource/sound/enemy/enemy6_die.wav" },
+	"CrimsonBalrog" : { "attack" : "resource/sound/enemy/enemy7_attack.wav", "hit" : "resource/sound/enemy/enemy7_hit.wav", "die" : "resource/sound/enemy/enemy7_die.wav" }
+}

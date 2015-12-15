@@ -1,47 +1,53 @@
-from pico2d import *
 from etc import *
 import game_framework
 import start_state
-import image
+import ending_state
+
+name = "ResultState"
 
 result = None
 ui_image = None
-game_time = 0.0
+
 
 def enter():
-    global ui_image, game_time
-    game_time = 0.0
-
-    for i in image.imageList:
-        if i.name == 'UI':
-            ui_image = i.image
+    global ui_image, font
+    font = get_font(40)
+    ui_image = get_image('UI')
 
 
 def exit():
-    global ui_image, game_time, result
-    del(ui_image, game_time, result)
+    global ui_image, result
+    del(ui_image, result)
 
 
 def update(frame_time):
-    global game_time
-    game_time += frame_time
-
-    if game_time > 2:
-        game_framework.change_state(start_state)
+    pass
 
 
 def draw(frame_time):
-    global result, ui_image
+    global result, ui_image, font
+    font.draw(335,200, "Press space bar to continue", (255,255,255))
     if result == True:
-        ui_image.clip_draw(33, 800, 195, 122, 600, 300)
+        draw_win()
     elif result == False:
-        ui_image.clip_draw(200, 800, 195, 122, 600, 300)
+        draw_lose()
 
     update_canvas()
 
 
+def handle_events(frame_time):
+    events = get_events()
+    for event in events:
+        if event.type == SDL_QUIT:
+            game_framework.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_ESCAPE):
+            game_framework.quit()
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
+            if stage_name() == 'ending':
+                game_framework.change_state(ending_state)
+            else:
+                game_framework.change_state(start_state)
 
 
-def handle_events(frame_time): pass
 def pause(): pass
 def resume(): pass

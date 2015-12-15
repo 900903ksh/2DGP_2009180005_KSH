@@ -1,53 +1,54 @@
 from pico2d import *
 import game_framework
-import image
+import title_state
 
 name = "LogoState"
 
 logo_image = None
 bg_image = None
+logo_bgm = None
+loading_font = None
 logo_time = 0.0
 
 
 def enter():
-    global logo_image
-    global bg_image
+    global logo_image, bg_image, logo_bgm, loading_font
 
     open_canvas(1200,600)
 
+    logo_bgm = load_music('resource/sound/bgm_logo.mp3')
     logo_image = load_image('resource/logo.png')
     bg_image = load_image('resource/logo_bg.png')
+    loading_font = load_font('resource/font/malgunbd.ttf',40)
+
+    logo_bgm.set_volume(32)
+    logo_bgm.play()
 
 
 def exit():
-    global logo_image, bg_image, logo_time
-    del(logo_image)
-    del(bg_image)
-    del(logo_time)
+    global logo_image, bg_image, logo_time, logo_bgm, loading_font
+    del(logo_image, bg_image, logo_time, logo_bgm, loading_font)
 
 
 def update(frame_time):
     global logo_time
-    if (logo_time > 0.1): #3.9
+    if (logo_time > 4.0): #3.9
         logo_time = 0
-        game_framework.change_state(image)
+        game_framework.change_state(title_state)
     else:
         logo_time += frame_time
 
 
 def draw(frame_time):
-    global logo_image
-    global bg_image
-
     clear_canvas()
-
+    bg_image.draw(600,300)
     if logo_time < 2:
         logo_image.opacify(logo_time * 0.48)
-    else:
+    elif logo_time >= 2 and logo_time < 3.9:
         logo_image.opacify(1.0 - (logo_time * 0.51))
-    bg_image.draw(600,300)
+    elif logo_time > 4.0:
+        loading_font.draw(510,300,'LOADING...')
     logo_image.draw(600,300)
-
     update_canvas()
 
 

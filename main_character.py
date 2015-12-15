@@ -81,7 +81,7 @@ class MainCharacter:
         if self.spirit_amount < 0: self.spirit_amount = 0
         self.reattack_time += frame_time
         self.game_time += frame_time
-        self.spirit_amount += frame_time
+        self.spirit_amount += frame_time * mc_data['spirit_increase_rate']
 
         if self.effect_on == True:
             self.effect_total_frame += MainCharacter.FRAMES_PER_ACTION * MainCharacter.ACTION_PER_TIME * frame_time

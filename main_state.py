@@ -3,7 +3,6 @@ from pico2d import *
 import game_framework
 import enemy
 import friend
-import skill
 import boss
 import random
 import main_character
@@ -47,7 +46,6 @@ def destroy_world():
     del(bg, mc, regen_time)
     del(friendList, enemyList, spiritList, skillList)
     get_sound(stage_name()).stop()
-
 
 
 def enter():
@@ -119,7 +117,6 @@ def update(frame_time):
             result_state.result = lose()
 
 
-
 def draw(frame_time):
     global limit_time
     clear_canvas()
@@ -156,7 +153,8 @@ def handle_events(frame_time):
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHTBRACKET): ## 스테이지 넘어가는 키 입력
             game_framework.change_state(result_state)
             result_state.result = win()
-
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_p): ## 메인캐릭터 혼령 추가하는 치트
+            mc.spirit_amount += 100
         else:
             mc.handle_events(event)
     pass

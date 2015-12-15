@@ -1,9 +1,11 @@
 {
-	"hp" : 2000, "damage" : 30,
+	"hp" : 1000, "max_hp" : 1000, "for_mc_damage" : 100,
+	"for_unit_damage" : 20, "for_unit_damage_in_injury" : 40, "for_unit_damage_in_fatal" : 70,
 	"left_hand_bb":  { "l":460, "b":20, "r":600, "h":180 },
 	"lower_body_bb" : { "l":750, "b":0, "r":1000, "h":80 },
-	"upper_body_bb" :  { "l":650, "b":110, "r":970, "h":400 },
+	"upper_body_bb" : { "l":650, "b":110, "r":970, "h":400 },
 	"BODY_STAND"  : { "xframe": 6, "yframe":1, "left":843, "bottom":584, "width":843, "height":584, "xpos": 850, "ypos":260 },
+	"BODY_DIE"    : { "xframe": 8, "yframe":2, "left":967, "bottom":793, "width":967, "height":793, "xpos": 799, "ypos":171 },
 	"SKILL1"      : { "xframe": 8, "yframe":2, "left":909, "bottom":601, "width":909, "height":601, "xpos": 819, "ypos":268 },
 	"SKILL2"      : { "xframe": 9, "yframe":2, "left":854, "bottom":590, "width":854, "height":590, "xpos": 849, "ypos":262 },
 	"LHAND_STAND" : { "xframe":12, "yframe":0, "left":286, "bottom":  0, "width":286, "height":218, "xpos": 520, "ypos":100 },
